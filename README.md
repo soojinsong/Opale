@@ -7,3 +7,11 @@
 👉 [클릭하면 시연 영상으로 이동](https://youtu.be/cEA03NYIXLU)
 
 ---
+
+## 🗄️ ERD
+
+<img width="800" alt="ERD_Opale" src="https://github.com/user-attachments/assets/830b0203-e2f4-4b57-ba52-6391737b69cb" />
+
+
+
+---
