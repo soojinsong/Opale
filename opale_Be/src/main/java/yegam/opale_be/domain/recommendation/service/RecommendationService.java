@@ -86,8 +86,9 @@ public class RecommendationService {
   private static final String GENRE_CACHE_KEY_PREFIX = "recommendation:genre:";
 
   // 상수
-  private static final double SIMILARITY_WEIGHT = 0.7; // 사용자 취향의 비중
-  private static final double RECENCY_WEIGHT = 0.3; // 최근인 것의 비중
+  private static final double SIMILARITY_WEIGHT = 0.6;
+  private static final double RECENCY_WEIGHT = 0.2;
+  private static final double POPULARITY_WEIGHT = 0.2;
   private static final double DECAY_DAYS = 30.0;
 
   // utils
@@ -159,32 +160,33 @@ public class RecommendationService {
 
     LocalDate now = LocalDate.now();
 
+    long maxViewCount = performances.stream()
+        .mapToLong(p -> p.getViewCount() != null ? p.getViewCount() : 0L)
+        .max()
+        .orElse(1L);
+
     List<RecommendedPerformanceDto> dtoList = new ArrayList<>();
 
     for (String id : ids) {
       Performance p = performanceMap.get(id);
       if (p == null) continue;
 
-      // key 값 반환. 없으면 0.0 반환.
       double similarity = scoreMap.getOrDefault(id, 0.0);
 
-      // 최신성 계산
       double recency = 0.0;
       if (p.getStartDate() != null) {
-        recency = calculateRecency(
-            p.getStartDate().toLocalDate(),
-            now
-        );
+        recency = calculateRecency(p.getStartDate().toLocalDate(), now);
       }
 
-      // 최종 점수(개인 취향 + 최신성 반영)
+      long viewCount = p.getViewCount() != null ? p.getViewCount() : 0L;
+      double popularity = (double) viewCount / Math.max(maxViewCount, 1L);
+
       double finalScore =
           similarity * SIMILARITY_WEIGHT +
-              recency * RECENCY_WEIGHT;
+          recency   * RECENCY_WEIGHT +
+          popularity * POPULARITY_WEIGHT;
 
-      dtoList.add(
-          recommendationMapper.toPerformance(p, finalScore)
-      );
+      dtoList.add(recommendationMapper.toPerformance(p, finalScore));
     }
 
     // 최종 점수 순으로 dto 리스트로 변환.
