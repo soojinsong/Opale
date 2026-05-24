@@ -43,6 +43,7 @@ opale_Be/src/main/resources/application.properties
 opale_Be/src/main/resources/application-*.properties
 opale_Be/.env
 opale_Be/src/main/java/**/global/init/
+opale_Be/uploads/
 
 # ================================
 # Logs
