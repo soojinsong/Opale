@@ -1,0 +1,117 @@
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import MainLayout from '../layouts/MainLayout';
+import ContentsLayout from '../layouts/ContentsLayout';
+import ScrollToTop from '../components/common/ScrollToTop';
+
+import MainHomePage from '../pages/home/MainHomePage';
+
+import LoginPage from '../pages/user/auth/LoginPage';
+import SignupPage from '../pages/user/auth/SignupPage';
+import WelcomePage from '../pages/user/auth/WelcomePage';
+import NewPasswordPage from '../pages/user/auth/NewPasswordPage';
+import SuccessedNewPasswordPage from '../pages/user/auth/SuccessedNewPasswordPage';
+
+import MainMyPage from '../pages/user/mypage/MainMyPage';
+import UpdateMyInfoPage from '../pages/user/mypage/UpdateMyInfoPage';
+import ChangePasswordPage from '../pages/user/mypage/ChangePasswordPage';
+import FavoriteCulturePerformancePage from '../pages/user/mypage/FavoriteCulturePerformancePage';
+import FavoriteReviewPage from '../pages/user/mypage/FavoriteReviewPage';
+import MyReviewPage from '../pages/user/mypage/MyReviewPage';
+import BookingPerformancePage from '../pages/user/mypage/BookingPerformancePage';
+import BookingPerformanceRegistrationPage from '../pages/user/mypage/BookingPerformanceRegistrationPage';
+import MyPageTicketPage from '../pages/user/mypage/MyTicketPage';
+import TicketRegisterPage from '../pages/user/mypage/TicketRegisterPage';
+import PerformanceReviewRegisterPage from '../pages/user/mypage/PerformanceReviewRegisterPage';
+import PlaceReviewRegisterPage from '../pages/user/mypage/PlaceReviewRegisterPage';
+import ExpectationReviewRegisterPage from '../pages/user/mypage/ExpectationReviewRegisterPage';
+
+import MainCulturePage from '../pages/culture/MainCulturePage';
+import SearchCulturePage from '../pages/culture/SearchCulturePage';
+import DetailPerformancePage from '../pages/culture/DetailPerformancePage';
+
+import MainPlacePage from '../pages/place/MainPlacePage';
+import SearchPlacePage from '../pages/place/SearchPlacePage';
+import DetailPlacePage from '../pages/place/DetailPlacePage';
+
+import MainChatPage from '../pages/chat/MainChatPage';
+import SearchChatPage from '../pages/chat/SearchChatPage';
+import RoomPage from '../pages/chat/RoomPage';
+
+import MainRecommandPage from '../pages/recommand/MainRecommandPage';
+import PerformanceSignalPage from '../pages/recommand/PerformanceSignalPage';
+import KeywordPerformancePage from '../pages/recommand/KeywordPerformancePage';
+
+import MainAdminPage from '../pages/admin/MainAdminPage';
+import PerformanceAdminPage from '../pages/admin/PerformanceAdminPage';
+import HomeBannerAdminPage from '../pages/admin/HomeBannerAdminPage';
+import PerformanceBannerAdminPage from '../pages/admin/PerformanceBannerAdminPage';
+import ContentBannerAdminPage from '../pages/admin/ContentBannerAdminPage';
+
+import LaunchingPage from '../pages/exception/LaunchingPage';
+import ErrorPage from '../pages/exception/ErrorPage';
+
+const AppRouter = () => {
+  return (
+    <BrowserRouter>
+      <ScrollToTop />
+      <Routes>
+        <Route path="/launching" element={<LaunchingPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/signup/welcome" element={<WelcomePage />} />
+        <Route path="/new-password" element={<NewPasswordPage />} />
+        <Route path="/new-password/success" element={<SuccessedNewPasswordPage />} />
+        <Route path="*" element={<ErrorPage />} />
+
+        <Route path="/" element={<MainLayout />}>
+          <Route index element={<MainHomePage />} />
+          
+          <Route path="my" element={<MainMyPage />} />
+          <Route path="my/update-info" element={<UpdateMyInfoPage />} />
+          <Route path="my/change-password" element={<ChangePasswordPage />} />
+          <Route path="my/favorite-performances" element={<FavoriteCulturePerformancePage />} />
+          <Route path="my/favorite-reviews" element={<FavoriteReviewPage />} />
+          <Route path="my/my-reviews" element={<MyReviewPage />} />
+          <Route path="my/booking-performances" element={<BookingPerformancePage />} />
+          <Route path="my/booking-performances/register" element={<BookingPerformanceRegistrationPage />} />
+          <Route path="my/tickets" element={<MyPageTicketPage />} />
+          <Route path="my/tickets/register" element={<TicketRegisterPage />} />
+          <Route path="my/tickets/edit" element={<TicketRegisterPage />} />
+          <Route path="my/performanceReviews/register" element={<PerformanceReviewRegisterPage />} />
+          <Route path="my/placeReviews/register" element={<PlaceReviewRegisterPage />} />
+          <Route path="my/expectationReviews/register" element={<ExpectationReviewRegisterPage />} />
+
+          <Route path="culture" element={<MainCulturePage />} />
+          <Route path="culture/search" element={<SearchCulturePage />} />
+
+          <Route path="place" element={<MainPlacePage />} />
+          <Route path="place/search" element={<SearchPlacePage />} />
+
+          <Route path="chat" element={<MainChatPage />} />
+          <Route path="chat/search" element={<SearchChatPage />} />
+
+          <Route path="recommend" element={<MainRecommandPage />} />
+          <Route path="recommend/signal" element={<PerformanceSignalPage />} />
+          <Route path="recommend/ticket" element={<Navigate to="/my/tickets/register" replace />} />
+          <Route path="recommend/review" element={<Navigate to="/my/tickets/register" replace />} />
+          <Route path="recommend/my-ticket" element={<Navigate to="/my/tickets" replace />} />
+          <Route path="recommend/keyword" element={<KeywordPerformancePage />} />
+
+          <Route path="admin" element={<MainAdminPage />} />
+          <Route path="admin/performance" element={<PerformanceAdminPage />} />
+          <Route path="admin/banner/home" element={<HomeBannerAdminPage />} />
+          <Route path="admin/banner/performance" element={<PerformanceBannerAdminPage />} />
+          <Route path="admin/banner/content" element={<ContentBannerAdminPage />} />
+        </Route>
+
+        <Route path="/culture/:id" element={<ContentsLayout><DetailPerformancePage /></ContentsLayout>} />
+        <Route path="/place/:id" element={<ContentsLayout><DetailPlacePage /></ContentsLayout>} />
+        <Route path="/chat/:id" element={<ContentsLayout><RoomPage /></ContentsLayout>} />
+
+      </Routes>
+    </BrowserRouter>
+  );
+};
+
+export default AppRouter;

@@ -1,0 +1,85 @@
+name: Deploy Spring Boot to EC2 with Docker Compose
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 1️⃣ JAR 빌드
+      - name: Build JAR
+        run: |
+          chmod +x gradlew
+          ./gradlew clean build -x test
+          echo "📦 Build 결과:"
+          ls -al build/libs
+
+      # 2️⃣ JAR 업로드
+      - name: Upload JAR to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "build/libs/*.jar"
+          target: "/home/ec2-user/opale_be"
+          overwrite: true
+
+      # 3️⃣ EC2에서 docker-compose up 실행
+      - name: Deploy on EC2 with Docker Compose
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+            cd /home/ec2-user/opale_be
+
+            # 🔥 기존 컨테이너 삭제
+            echo "🧹 기존 컨테이너 정리"
+            docker stop opale-be || true
+            docker rm opale-be || true
+            docker stop mysql-opale || true
+            docker rm mysql-opale || true
+            docker stop opale-redis || true
+            docker rm opale-redis || true
+
+            echo "📂 현재 디렉토리:"
+            pwd
+            ls -al
+
+            echo "📂 build/libs 내용:"
+            ls -al build/libs || echo "⚠ build/libs 없음"
+
+            echo "🔍 최신 JAR 찾기 (plain 제외)"
+            JAR_FILE=$(find build/libs -maxdepth 1 -name "*.jar" ! -name "*-plain.jar" | head -n 1)
+
+            if [ -z "$JAR_FILE" ]; then
+              echo "❌ JAR 파일이 없습니다. (build/libs 확인 필요)"
+              exit 1
+            fi
+
+            echo "📦 JAR 파일 발견: $JAR_FILE → app.jar로 복사"
+            cp "$JAR_FILE" app.jar
+
+            if [ ! -f /home/ec2-user/resources/application.yml ]; then
+              echo "❌ /home/ec2-user/resources/application.yml 이 없습니다."
+              exit 1
+            fi
+            echo "✅ application.yml 존재 확인됨"
+
+            echo "🚀 docker-compose up -d --build 실행"
+            docker-compose up -d --build
+
+            echo "🔎 컨테이너 상태:"
+            docker ps -a
+
+            echo "📜 opale-be 최근 로그:"
+            docker logs opale-be --tail=200 || true

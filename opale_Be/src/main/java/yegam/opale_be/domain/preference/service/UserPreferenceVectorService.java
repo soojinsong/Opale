@@ -1,0 +1,59 @@
+package yegam.opale_be.domain.preference.service;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import yegam.opale_be.domain.preference.dto.request.UserPreferenceVectorRequestDto;
+import yegam.opale_be.domain.preference.dto.response.UserPreferenceVectorResponseDto;
+import yegam.opale_be.domain.preference.entity.UserPreferenceVector;
+import yegam.opale_be.domain.preference.exception.PreferenceErrorCode;
+import yegam.opale_be.domain.preference.mapper.UserPreferenceVectorMapper;
+import yegam.opale_be.domain.preference.repository.UserPreferenceVectorRepository;
+import yegam.opale_be.domain.user.entity.User;
+import yegam.opale_be.domain.user.exception.UserErrorCode;
+import yegam.opale_be.domain.user.repository.UserRepository;
+import yegam.opale_be.global.exception.CustomException;
+
+/**
+ * 사용자 선호 벡터(UserPreferenceVector)를 관리하는 Service 클래스
+ * - UserPreferenceVector 생성, 업데이트, 조회
+ */
+@Slf4j
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class UserPreferenceVectorService {
+
+  private final UserPreferenceVectorRepository preferenceRepository;
+  private final UserPreferenceVectorMapper preferenceMapper;
+  private final UserRepository userRepository;
+
+  /** 조회 */
+  public UserPreferenceVectorResponseDto getUserVector(Long userId) {
+    UserPreferenceVector vector = preferenceRepository.findById(userId)
+        .orElseThrow(() -> new CustomException(PreferenceErrorCode.VECTOR_NOT_FOUND));
+    return preferenceMapper.toResponseDto(vector);
+  }
+
+  /** 생성 */
+  @Transactional
+  public UserPreferenceVectorResponseDto createUserVector(Long userId, UserPreferenceVectorRequestDto dto) {
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+
+    UserPreferenceVector vector = preferenceMapper.toEntity(user, dto);
+    UserPreferenceVector saved = preferenceRepository.save(vector);
+    return preferenceMapper.toResponseDto(saved);
+  }
+
+  /** 업데이트 */
+  @Transactional
+  public UserPreferenceVectorResponseDto updateUserVector(Long userId, UserPreferenceVectorRequestDto dto) {
+    UserPreferenceVector entity = preferenceRepository.findById(userId)
+        .orElseThrow(() -> new CustomException(PreferenceErrorCode.VECTOR_NOT_FOUND));
+
+    preferenceMapper.updateEntity(entity, dto);
+    return preferenceMapper.toResponseDto(entity);
+  }
+}

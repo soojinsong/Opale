@@ -1,0 +1,59 @@
+# ================================
+# OS
+# ================================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ================================
+# IDE
+# ================================
+.idea/
+.vscode/
+*.iml
+*.suo
+*.user
+
+# ================================
+# FE (React / Node.js)
+# ================================
+opale_Fe/node_modules/
+opale_Fe/build/
+opale_Fe/dist/
+opale_Fe/.env
+opale_Fe/.env.local
+opale_Fe/.env.development.local
+opale_Fe/.env.test.local
+opale_Fe/.env.production.local
+opale_Fe/npm-debug.log*
+opale_Fe/yarn-debug.log*
+opale_Fe/yarn-error.log*
+
+# ================================
+# BE (Spring Boot / Gradle)
+# ================================
+opale_Be/build/
+opale_Be/.gradle/
+opale_Be/out/
+opale_Be/*.jar
+opale_Be/*.war
+opale_Be/src/main/resources/application.yml
+opale_Be/src/main/resources/application-*.yml
+opale_Be/src/main/resources/application.properties
+opale_Be/src/main/resources/application-*.properties
+opale_Be/.env
+opale_Be/src/main/java/**/global/init/
+
+# ================================
+# Logs
+# ================================
+*.log
+logs/
+
+# ================================
+# Claude Code / 프로젝트 메타데이터
+# ================================
+.claude/
+CLAUDE.md
+BUG_REPORT.md
+opale_diagram.md

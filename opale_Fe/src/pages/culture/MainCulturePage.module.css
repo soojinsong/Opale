@@ -1,0 +1,388 @@
+.container {
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  background-color: #FFFFFF;
+  min-height: 100vh;
+  position: relative;
+  padding-bottom: 61px; /* Footer 높이만큼 (1px border + 60px min-height) */
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+
+/* Search Section */
+.searchSection {
+  margin-top: 0;
+  padding: 16px 24px 0 24px;
+  position: relative;
+  z-index: 50;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.searchForm {
+  position: relative;
+  display: flex;
+  align-items: center;
+  z-index: 1000;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 12px 50px 12px 16px;
+  border: 1px solid #FFC0CB;
+  border-radius: 8px;
+  font-size: 16px;
+  color: #000000;
+  background-color: #FFFFFF;
+  outline: none;
+}
+
+.searchInput::placeholder {
+  color: #999999;
+}
+
+.searchInput:focus {
+  border-color: #FFC0CB;
+}
+
+.searchIcon {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+}
+
+/* Search Suggestions */
+.suggestionsContainer {
+  position: absolute;
+  top: calc(100% - 10px);
+  left: 24px;
+  right: 24px;
+  background-color: #FFFFFF;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 900;
+  margin-top: 0;
+  padding-top: 5px;
+}
+
+.suggestionsDivider {
+  height: 1px;
+  background-color: #FFC0CB;
+  margin: 0;
+}
+
+.suggestionsList {
+  padding: 8px 0;
+}
+
+.suggestionItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.suggestionItem:hover {
+  background-color: #F5F5F5;
+}
+
+.suggestionContent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.suggestionText {
+  font-size: 16px;
+  color: #000000;
+  font-weight: 500;
+}
+
+.suggestionMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.suggestionPlace {
+  font-size: 12px;
+  color: #999999;
+  line-height: 1.3;
+}
+
+.suggestionDate {
+  font-size: 11px;
+  color: #999999;
+  line-height: 1.3;
+}
+
+.viewAllResults {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border-top: 1px solid #F5F5F5;
+}
+
+.viewAllResults:hover {
+  background-color: #F5F5F5;
+}
+
+.viewAllText {
+  font-size: 16px;
+  color: #000000;
+}
+
+/* Category Section */
+.categorySection {
+  padding: 20px 24px 16px;
+  background-color: #FFFFFF;
+  box-sizing: border-box;
+  width: 100%;
+  overflow-x: visible;
+  overflow-y: visible;
+  position: relative;
+}
+
+.categoryTabs {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  touch-action: pan-x;
+  scroll-behavior: smooth;
+  margin-left: -24px;
+  margin-right: -24px;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+.categoryTabs::-webkit-scrollbar {
+  display: none;
+}
+
+.categoryTab {
+  padding: 8px 12px;
+  background-color: #F5F5F5;
+  border: none;
+  font-size: 12px;
+  color: #666666;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  min-width: fit-content;
+}
+
+.categoryTab:hover {
+  background-color: #E5E5E5;
+}
+
+.activeCategory {
+  background-color: #000000;
+  color: #FFFFFF;
+}
+
+/* 진행중인 공연만 보기 필터 */
+.ongoingFilter {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #E5E5E5;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #000000;
+  flex-shrink: 0;
+}
+
+.checkboxText {
+  font-size: 14px;
+  color: #000000;
+  font-weight: 500;
+}
+
+/* Performance Grid */
+.performanceGrid {
+  padding: 0 24px 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.performanceCard {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s ease;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.performanceCard:hover {
+  transform: translateY(-2px);
+}
+
+.performanceCard:active {
+  transform: translateY(0);
+}
+
+/* .performanceCard * {
+  pointer-events: none;
+  user-select: none;
+} */
+
+.posterCard {
+  width: 100%;
+  height: 240px;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+/* 실제 포스터 이미지 렌더링 */
+.posterImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Card Info */
+.cardInfo {
+  padding: 0 4px;
+}
+
+.cardTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #000000;
+  margin-bottom: 2px;
+  line-height: 1.2;
+}
+
+.cardSubtitle {
+  font-size: 12px;
+  color: #666666;
+  margin-bottom: 6px;
+  line-height: 1.2;
+}
+
+.cardRating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.star {
+  color: #FF69B4;
+  font-size: 12px;
+}
+
+.ratingText {
+  font-size: 11px;
+  color: #000000;
+  font-weight: 500;
+}
+
+.cardKeywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.keyword {
+  font-size: 10px;
+  color: #666666;
+  background-color: #F5F5F5;
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+
+/* 반응형 디자인 */
+@media (max-width: 375px) {
+  .container {
+    max-width: 375px;
+  }
+  
+  .headerContent {
+    padding: 14px 20px;
+  }
+  
+  .searchSection {
+    margin-top: 55px;
+    padding: 14px 20px;
+  }
+  
+  .categorySection {
+    padding: 16px 20px 12px;
+  }
+  
+  .performanceGrid {
+    padding: 0 20px 16px;
+    gap: 12px;
+  }
+  
+  .posterCard {
+    height: 200px;
+  }
+  
+  .posterTitle {
+    font-size: 16px;
+  }
+  
+  .posterContent {
+    padding: 12px;
+  }
+  
+  .suggestionsContainer {
+    left: 20px;
+    right: 20px;
+  }
+}
+
+@media (min-width: 430px) {
+  .container {
+    max-width: 430px;
+  }
+}

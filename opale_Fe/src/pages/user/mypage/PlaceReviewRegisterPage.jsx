@@ -1,0 +1,167 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { createPlaceReview } from '../../../api/reviewApi';
+import { normalizePlaceReviewRequest } from '../../../services/normalizePlaceReviewRequest';
+import logApi from '../../../api/logApi';
+import styles from './PlaceReviewRegisterPage.module.css';
+
+const PlaceReviewRegisterPage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { isLoggedIn } = useSelector((state) => state.user);
+  
+  const ticketData = location.state?.ticketData || {};
+  const placeId = location.state?.placeId || ticketData?.placeId || null;
+  const performanceId = location.state?.performanceId || ticketData?.performanceId || null;
+  const fromPerformanceDetail = location.state?.fromPerformanceDetail || false;
+  const returnUrl = location.state?.returnUrl || null;
+  const isThreeStepFlow = location.state?.isThreeStepFlow || false;
+  
+  const [reviewData, setReviewData] = useState({
+    title: '',
+    rating: 5,
+    content: ''
+  });
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      const returnUrl = location.state?.returnUrl || window.location.pathname;
+      navigate('/login', { state: { returnUrl } });
+    }
+  }, [isLoggedIn, navigate, location.state]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!reviewData.title || !reviewData.content) {
+      alert('제목과 내용을 입력해주세요.');
+      return;
+    }
+
+    if (!placeId) {
+      alert('공연장 정보가 없습니다.');
+      return;
+    }
+
+    try {
+      const requestDto = normalizePlaceReviewRequest(reviewData, placeId);
+
+      await createPlaceReview(requestDto);
+
+      try {
+        await logApi.createLog({
+          eventType: "REVIEW_WRITE",
+          targetType: "PLACE",
+          targetId: String(placeId)
+        });
+      } catch (logErr) {
+        console.error('로그 기록 실패:', logErr);
+      }
+
+      if (returnUrl) {
+        navigate(returnUrl);
+      } else if (fromPerformanceDetail && performanceId) {
+        navigate(`/culture/${performanceId}?tab=review`);
+      } else if (placeId) {
+        navigate(`/place/${placeId}`);
+      } else {
+        navigate('/my/tickets');
+        window.dispatchEvent(new Event('ticketUpdated'));
+      }
+    } catch (err) {
+      console.error('공연장 리뷰 등록 실패:', err);
+      alert(err.response?.data?.message || err.message || '공연장 리뷰 등록에 실패했습니다.');
+    }
+  };
+
+  const handleCancel = () => {
+    if (isThreeStepFlow && returnUrl) {
+      navigate(returnUrl);
+    } else if (placeId) {
+      navigate(`/place/${placeId}`);
+    } else {
+      navigate('/my/tickets');
+    }
+  };
+
+  const handleInputChange = (field, value) => {
+    setReviewData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  return (
+    <div className={styles.container}>
+      {/* 상단 헤더 */}
+      <div className={styles.header}>
+        <div></div>
+        <h2 className={styles.headerTitle}>공연장 리뷰 작성</h2>
+        <button className={styles.closeButton} onClick={handleCancel}>×</button>
+      </div>
+
+      <div className={styles.content}>
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <div className={styles.formGroup}>
+            <label>제목</label>
+            <input
+              type="text"
+              value={reviewData.title}
+              onChange={(e) => handleInputChange('title', e.target.value)}
+              placeholder="제목을 입력하세요"
+              className={styles.input}
+              required
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>평점</label>
+            <div className={styles.ratingInput}>
+              {[1, 2, 3, 4, 5].map(star => (
+                <button
+                  key={star}
+                  type="button"
+                  className={`${styles.ratingStar} ${star <= reviewData.rating ? styles.filled : ''}`}
+                  onClick={() => handleInputChange('rating', star)}
+                >
+                  ★
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>내용</label>
+            <textarea
+              value={reviewData.content}
+              onChange={(e) => handleInputChange('content', e.target.value)}
+              placeholder="공연장에 대한 리뷰를 작성해주세요"
+              rows={6}
+              className={styles.textarea}
+              required
+            />
+          </div>
+
+          <div className={styles.formActions}>
+            <button 
+              type="button"
+              className={styles.cancelButton}
+              onClick={handleCancel}
+            >
+              {isThreeStepFlow ? '스킵' : '취소'}
+            </button>
+            <button 
+              type="submit"
+              className={styles.submitButton}
+            >
+              작성하기
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default PlaceReviewRegisterPage;

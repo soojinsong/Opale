@@ -1,0 +1,51 @@
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Build
+/build/
+out/
+target/
+
+# Gradle
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+*.env
+
+# Spring Boot
+application.yml
+application-*.yml
+application.properties
+application-*.properties
+
+# Temp
+*.tmp
+*.bak
+*.swp
+.vscode/
+.ipynb_checkpoints/
+
+
+# Ignore admin initializer (local-only setup)
+src/main/java/yegam/opale_be/global/init/
+
+
+
+# Docker local MySQL volume
+mysql-data/
+
+
+

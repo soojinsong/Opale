@@ -1,0 +1,111 @@
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  width: 100%;
+}
+
+.spinnerWrapper {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin-bottom: 1.5rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.spinner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  animation: rotate 2s linear infinite;
+  transform-origin: center center;
+}
+
+.dot {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #DFE6F6;
+  box-shadow: 0 0 6px rgba(223, 230, 246, 0.6);
+  /* 원의 중심에서 시작 - 정확히 중앙 */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* 5개의 점을 원형으로 균등하게 배치 (72도 간격, 반지름 28px) */
+/* 각 점은 중심에서 시작해서 원형으로 배치 */
+.dot:nth-child(1) {
+  transform: translate(-50%, -50%) translateY(-28px);
+  animation: pulse 1.5s ease-in-out infinite 0s;
+  background: #DFE6F6;
+  box-shadow: 0 0 6px rgba(223, 230, 246, 0.6);
+}
+
+.dot:nth-child(2) {
+  transform: translate(-50%, -50%) rotate(72deg) translateY(-28px) rotate(-72deg);
+  animation: pulse 1.5s ease-in-out infinite 0.3s;
+  background: #FFFBD6;
+  box-shadow: 0 0 6px rgba(255, 251, 214, 0.6);
+}
+
+.dot:nth-child(3) {
+  transform: translate(-50%, -50%) rotate(144deg) translateY(-28px) rotate(-144deg);
+  animation: pulse 1.5s ease-in-out infinite 0.6s;
+  background: #FBCCDC;
+  box-shadow: 0 0 6px rgba(251, 204, 220, 0.6);
+}
+
+.dot:nth-child(4) {
+  transform: translate(-50%, -50%) rotate(216deg) translateY(-28px) rotate(-216deg);
+  animation: pulse 1.5s ease-in-out infinite 0.9s;
+  background: #FEEDF3;
+  box-shadow: 0 0 6px rgba(254, 237, 243, 0.6);
+}
+
+.dot:nth-child(5) {
+  transform: translate(-50%, -50%) rotate(288deg) translateY(-28px) rotate(-288deg);
+  animation: pulse 1.5s ease-in-out infinite 1.2s;
+  background: #D4EBD9;
+  box-shadow: 0 0 6px rgba(212, 235, 217, 0.6);
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.loadingText {
+  font-size: 1rem;
+  color: #666;
+  font-weight: 500;
+  animation: fadeInOut 2s ease-in-out infinite;
+  margin: 0;
+}
+
+@keyframes fadeInOut {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+

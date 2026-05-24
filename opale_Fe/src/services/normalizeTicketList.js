@@ -1,0 +1,107 @@
+/**
+ * 티켓 목록 API 응답을 프론트엔드 형식으로 정제
+ */
+
+import { transformTicketDataFromApi } from '../utils/ticketDataTransform';
+
+/**
+ * 티켓 목록 API 응답을 프론트엔드 형식으로 변환
+ * @param {Object} apiResponse - API 응답 (TicketSimpleListResponseDto)
+ * @param {number} apiResponse.totalCount - 총 티켓 수
+ * @param {number} apiResponse.currentPage - 현재 페이지
+ * @param {number} apiResponse.pageSize - 페이지당 티켓 수
+ * @param {number} apiResponse.totalPages - 전체 페이지 수
+ * @param {boolean} apiResponse.hasNext - 다음 페이지 존재 여부
+ * @param {boolean} apiResponse.hasPrev - 이전 페이지 존재 여부
+ * @param {Array} apiResponse.tickets - 티켓 목록 (TicketSimpleResponseDto[])
+ * @returns {Object} - 정제된 티켓 목록 데이터
+ */
+export const normalizeTicketList = (apiResponse) => {
+  if (!apiResponse || !apiResponse.tickets) {
+    return {
+      totalCount: 0,
+      currentPage: 1,
+      pageSize: 10,
+      totalPages: 0,
+      hasNext: false,
+      hasPrev: false,
+      tickets: []
+    };
+  }
+
+  const normalizedTickets = apiResponse.tickets.map((ticket) => {
+    const frontendData = transformTicketDataFromApi({
+      performanceName: ticket.performanceName,
+      performanceDate: ticket.performanceDate,
+      seatFront: ticket.seatFront,
+      seatNumber: ticket.seatNumber,
+      seatInfo: ticket.seatInfo,
+      placeName: ticket.placeName,
+      performanceId: ticket.performanceId,
+      placeId: ticket.placeId
+    });
+
+    return {
+      id: ticket.ticketId,
+      ticketId: ticket.ticketId,
+      performanceId: ticket.performanceId || null,
+      placeId: ticket.placeId || null,
+      performanceName: ticket.performanceName || '',
+      performanceDate: frontendData?.performanceDate || '',
+      performanceTime: frontendData?.performanceTime || '',
+      seatFront: frontendData?.seatFront || '',
+      seatNumber: frontendData?.seatNumber || '',
+      placeName: ticket.placeName || '',
+      registeredDate: new Date().toLocaleDateString('ko-KR')
+    };
+  });
+
+  return {
+    totalCount: apiResponse.totalCount || 0,
+    currentPage: apiResponse.currentPage || 1,
+    pageSize: apiResponse.pageSize || 10,
+    totalPages: apiResponse.totalPages || 0,
+    hasNext: apiResponse.hasNext || false,
+    hasPrev: apiResponse.hasPrev || false,
+    tickets: normalizedTickets
+  };
+};
+
+/**
+ * 티켓을 예매한 공연/관람한 공연으로 분류
+ * @param {Array} tickets - 티켓 목록
+ * @returns {Object} - { booked: [], watched: [] }
+ */
+export const categorizeTickets = (tickets) => {
+  if (!tickets || !Array.isArray(tickets)) {
+    return { booked: [], watched: [] };
+  }
+
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  const booked = [];
+  const watched = [];
+
+  tickets.forEach((ticket) => {
+    if (!ticket.performanceDate) {
+      booked.push(ticket);
+      return;
+    }
+
+    const ticketDate = new Date(ticket.performanceDate);
+    const ticketDateOnly = new Date(
+      ticketDate.getFullYear(),
+      ticketDate.getMonth(),
+      ticketDate.getDate()
+    );
+
+    if (ticketDateOnly >= today) {
+      booked.push(ticket);
+    } else {
+      watched.push(ticket);
+    }
+  });
+
+  return { booked, watched };
+};
