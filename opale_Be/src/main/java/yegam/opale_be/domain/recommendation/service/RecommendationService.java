@@ -214,29 +214,26 @@ public class RecommendationService {
   }
 
 
-  // (벡터 DB 사용) 로그인한 사용자에게 개인화 추천 - 사용자 벡터가 없으면 global vector fallback
+  // (벡터 DB 사용) 로그인한 사용자에게 개인화 추천 - 사용자 벡터가 없으면 인기 공연 fallback
   @Transactional
   public RecommendationPerformanceListResponseDto getUserRecommendations(
       Long userId, Integer size, String sort
   ) {
-    // 사용자 선호 벡터를 가져옴
     UserPreferenceVector vec = preferenceRepository.findById(userId).orElse(null);
 
-    List<Double> vector;
-
-    // 없으면 평균을 벡터값으로 가짐. 있으면 그걸 리스트로 파싱.
     if (vec == null || vec.getEmbeddingVector() == null || vec.getEmbeddingVector().isBlank()) {
-      vector = globalPreferenceService.getGlobalVector();
-    } else {
-      try {
-        vector = embeddingVectorUtil.parseToList(vec.getEmbeddingVector());
-      } catch (Exception e) {
-        log.warn("벡터 파싱 실패 → global vector fallback, userId={}", userId);
-        vector = globalPreferenceService.getGlobalVector();
-      }
+      log.info("콜드 스타터 감지 → 인기 공연 fallback, userId={}", userId);
+      return getPopularRecommendations(size);
     }
 
-    // 벡터 DB에서 공연들을 가져옴.
+    List<Double> vector;
+    try {
+      vector = embeddingVectorUtil.parseToList(vec.getEmbeddingVector());
+    } catch (Exception e) {
+      log.warn("벡터 파싱 실패 → 인기 공연 fallback, userId={}", userId);
+      return getPopularRecommendations(size);
+    }
+
     return buildVectorBasedRecommendation(vector, size, sort);
   }
 
