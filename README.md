@@ -15,7 +15,7 @@ Opale은 공연 정보를 한 곳에서 탐색하고,
 
 기존 공연 플랫폼들은
 공연 정보, 할인 프로모션, 공연장 위치, 사용자 커뮤니티 기능이 분리되어 있어 사용자가 여러 서비스를 오가야 하는 불편함이 존재했습니다. 
-이러한 불편함을 해결하기 위해 공연 정보를 쉽게 얻을 수 잇도록 한 곳에 종합하여 제공하고 공연 문화를 활성화시키는 것을 목적으로 합니다. 
+이러한 불편함을 해결하기 위해 공연 정보를 쉽게 얻을 수 있도록 한 곳에 종합하여 제공하고 공연 문화를 활성화시키는 것을 목적으로 합니다. 
 
 이 프로젝트는
 **공연 탐색, 공연장 확인, 사용자 소통, 개인화 추천 및 할인 정보 확인**까지
@@ -69,6 +69,35 @@ Opale은 공연 정보를 한 곳에서 탐색하고,
 - 할인 프로모션 확인 (크롤링)
 - 관리자 콘텐츠 관리
 
+
+---
+
+## 🖼 주요 화면
+
+### 메인 페이지
+<img width="800" alt="Opale_Main" src="https://github.com/user-attachments/assets/aefddb49-98ac-4c85-978c-14a90463f908" />
+
+
+### 공연 페이지
+<img width="800" alt="Opale_Performance" src="https://github.com/user-attachments/assets/d34b815b-872d-44f4-8967-44a755e7e1f2" />
+
+
+### 공연장 페이지
+<img  width="800" alt="Opale_Place" src="https://github.com/user-attachments/assets/7d48447a-b8af-4a3b-8433-319b21bcaad0" />
+
+
+### 공연 오픈 채팅
+<img width="800" alt="Opale_Chat" src="https://github.com/user-attachments/assets/318eb844-15f9-4c86-b73a-7bebf06ec3bb" />
+
+
+### 추천 시스템
+<img width="800" alt="Opale_Recommend" src="https://github.com/user-attachments/assets/19dcc772-3788-4f5c-b067-a57639252260" />
+
+
+### 운영자 페이지
+<img width="800" alt="Opale_Admin" src="https://github.com/user-attachments/assets/aff469f7-9c8b-4a3a-a695-48244d9e5ca4" />
+
+
 ---
 
 ## 🚀 주요 기능
@@ -113,13 +142,20 @@ Opale은 공연 정보를 한 곳에서 탐색하고,
 - **KOPIS API 기반 공연 데이터 수집 및 관리**
 - **관리자 페이지를 통한 운영 기능 구현**
 
+
 ---
 
-## 👤 역할
 
-- 백엔드 전체 API 개발
-- 프론트엔드 공연장 관련 페이지, 운영자 페이지 퍼블리싱, 전체 API 연동
-- 배포, CICD 파이프라인 구축, 서버 관리 (AWS EC2, Nginx, Git Action)
+
+## 🤝 팀 구성
+
+|  | 송수진 | 조승희 |
+|:---:|:---:|:---:|
+| **GitHub** | [@soojinsong](https://github.com/soojinsong) | [@J0seunghee](https://github.com/J0seunghee) |
+| **Profile** | <img src="https://github.com/soojinsong.png" width="100"> | <img src="https://github.com/J0seunghee.png" width="100"> |
+| **담당 역할** | 백엔드 전체 API 개발<br>프론트엔드 공연장 페이지·운영자 페이지·API 연동<br>배포 · CICD · 서버 관리 | 프론트엔드 |
+
+
 
 ---
 
