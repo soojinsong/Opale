@@ -58,7 +58,11 @@ const LoginPage = () => {
           initializeUserTickets(userId);
         }
 
-        navigate(returnUrl || "/");
+        if (user?.onboardingCompleted === false) {
+          navigate("/signup/onboarding");
+        } else {
+          navigate(returnUrl || "/");
+        }
       } else {
         setError(result.message || "로그인 실패");
       }

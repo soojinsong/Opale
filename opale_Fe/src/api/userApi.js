@@ -88,6 +88,17 @@ export const deleteUser = async (dto) => {
   }
 };
 
+export const submitOnboarding = async (genres) => {
+  try {
+    const res = await axiosInstance.post(`${base}/onboarding`, { genres });
+    if (res.data.success) return true;
+    throw new Error("온보딩 완료 실패");
+  } catch (err) {
+    console.error("❌ submitOnboarding 오류:", err);
+    throw err;
+  }
+};
+
 export const resetPassword = async (email) => {
   try {
     const requestData = normalizePasswordResetRequest(email);
