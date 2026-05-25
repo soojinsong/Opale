@@ -161,29 +161,29 @@ Opale은 공연 정보를 한 곳에서 탐색하고,
 
 ## ⚙️ 실행 방법
 
-### 1. Database 설정 (MySQL)
-- MySQL 실행
-- 프로젝트에 포함된 `.sql` 파일 실행
+### 1. 필수 서비스 실행
+- MySQL, Redis, Elasticsearch 실행 필요
+- docker-compose 또는 로컬 환경에서 실행
 
-### 2. Redis + Elasticsearch 실행
+### 2. Backend 실행
 ```bash
-docker-compose up -d
-```
+# Mac / Linux
+./gradlew bootRun
 
-### 3. Backend 실행
-```bash
+# Windows
 .\gradlew.bat bootRun
 ```
 
-### 4. Frontend 실행
+### 3. Frontend 실행
 ```bash
 npm install
 npm run dev
-```
 
+```
 ※ KOPIS API Key, Naver Map API Key, OpenAI API Key, Pinecone API Key가 필요합니다.
 
 ※ Backend 실행 후 Frontend 실행을 권장합니다.
+
 
 
 
