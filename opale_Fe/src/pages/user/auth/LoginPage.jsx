@@ -24,7 +24,12 @@ const LoginPage = () => {
   useEffect(() => {
     const storedToken = localStorage.getItem("accessToken");
     if (storedToken && isLoggedIn) {
-      navigate("/");
+      const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+      if (storedUser?.onboardingCompleted !== true) {
+        navigate("/signup/onboarding");
+      } else {
+        navigate("/");
+      }
     }
   }, [isLoggedIn, navigate]);
 
@@ -58,7 +63,11 @@ const LoginPage = () => {
           initializeUserTickets(userId);
         }
 
-        navigate(returnUrl || "/");
+        if (user?.onboardingCompleted !== true) {
+          navigate("/signup/onboarding");
+        } else {
+          navigate(returnUrl || "/");
+        }
       } else {
         setError(result.message || "로그인 실패");
       }

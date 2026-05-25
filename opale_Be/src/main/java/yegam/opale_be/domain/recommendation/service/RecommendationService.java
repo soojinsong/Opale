@@ -86,8 +86,9 @@ public class RecommendationService {
   private static final String GENRE_CACHE_KEY_PREFIX = "recommendation:genre:";
 
   // 상수
-  private static final double SIMILARITY_WEIGHT = 0.7; // 사용자 취향의 비중
-  private static final double RECENCY_WEIGHT = 0.3; // 최근인 것의 비중
+  private static final double SIMILARITY_WEIGHT = 0.6;
+  private static final double RECENCY_WEIGHT = 0.2;
+  private static final double POPULARITY_WEIGHT = 0.2;
   private static final double DECAY_DAYS = 30.0;
 
   // utils
@@ -159,32 +160,33 @@ public class RecommendationService {
 
     LocalDate now = LocalDate.now();
 
+    long maxViewCount = performances.stream()
+        .mapToLong(p -> p.getViewCount() != null ? p.getViewCount() : 0L)
+        .max()
+        .orElse(1L);
+
     List<RecommendedPerformanceDto> dtoList = new ArrayList<>();
 
     for (String id : ids) {
       Performance p = performanceMap.get(id);
       if (p == null) continue;
 
-      // key 값 반환. 없으면 0.0 반환.
       double similarity = scoreMap.getOrDefault(id, 0.0);
 
-      // 최신성 계산
       double recency = 0.0;
       if (p.getStartDate() != null) {
-        recency = calculateRecency(
-            p.getStartDate().toLocalDate(),
-            now
-        );
+        recency = calculateRecency(p.getStartDate().toLocalDate(), now);
       }
 
-      // 최종 점수(개인 취향 + 최신성 반영)
+      long viewCount = p.getViewCount() != null ? p.getViewCount() : 0L;
+      double popularity = (double) viewCount / Math.max(maxViewCount, 1L);
+
       double finalScore =
           similarity * SIMILARITY_WEIGHT +
-              recency * RECENCY_WEIGHT;
+          recency   * RECENCY_WEIGHT +
+          popularity * POPULARITY_WEIGHT;
 
-      dtoList.add(
-          recommendationMapper.toPerformance(p, finalScore)
-      );
+      dtoList.add(recommendationMapper.toPerformance(p, finalScore));
     }
 
     // 최종 점수 순으로 dto 리스트로 변환.
@@ -214,29 +216,26 @@ public class RecommendationService {
   }
 
 
-  // (벡터 DB 사용) 로그인한 사용자에게 개인화 추천 - 사용자 벡터가 없으면 global vector fallback
+  // (벡터 DB 사용) 로그인한 사용자에게 개인화 추천 - 사용자 벡터가 없으면 인기 공연 fallback
   @Transactional
   public RecommendationPerformanceListResponseDto getUserRecommendations(
       Long userId, Integer size, String sort
   ) {
-    // 사용자 선호 벡터를 가져옴
     UserPreferenceVector vec = preferenceRepository.findById(userId).orElse(null);
 
-    List<Double> vector;
-
-    // 없으면 평균을 벡터값으로 가짐. 있으면 그걸 리스트로 파싱.
     if (vec == null || vec.getEmbeddingVector() == null || vec.getEmbeddingVector().isBlank()) {
-      vector = globalPreferenceService.getGlobalVector();
-    } else {
-      try {
-        vector = embeddingVectorUtil.parseToList(vec.getEmbeddingVector());
-      } catch (Exception e) {
-        log.warn("벡터 파싱 실패 → global vector fallback, userId={}", userId);
-        vector = globalPreferenceService.getGlobalVector();
-      }
+      log.info("콜드 스타터 감지 → 인기 공연 fallback, userId={}", userId);
+      return getPopularRecommendations(size);
     }
 
-    // 벡터 DB에서 공연들을 가져옴.
+    List<Double> vector;
+    try {
+      vector = embeddingVectorUtil.parseToList(vec.getEmbeddingVector());
+    } catch (Exception e) {
+      log.warn("벡터 파싱 실패 → 인기 공연 fallback, userId={}", userId);
+      return getPopularRecommendations(size);
+    }
+
     return buildVectorBasedRecommendation(vector, size, sort);
   }
 

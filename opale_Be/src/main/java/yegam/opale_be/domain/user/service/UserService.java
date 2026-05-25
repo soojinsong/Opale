@@ -71,6 +71,7 @@ public class UserService {
         .nickname(dto.getNickname())
         .role(User.Role.USER)
         .isDeleted(false)
+        .onboardingCompleted(false)
         .build();
 
     userRepository.save(user);

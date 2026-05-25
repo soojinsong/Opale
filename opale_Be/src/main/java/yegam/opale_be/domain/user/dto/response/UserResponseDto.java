@@ -44,4 +44,7 @@ public class UserResponseDto {
   @Schema(description = "가입일", example = "2025-10-31T12:30:00")
   private LocalDateTime createdAt;
 
+  @Schema(description = "온보딩 완료 여부", example = "false")
+  private Boolean onboardingCompleted;
+
 }
