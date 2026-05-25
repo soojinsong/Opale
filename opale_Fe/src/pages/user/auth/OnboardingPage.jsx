@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { updateUser } from '../../../store/userSlice';
 import { submitOnboarding } from '../../../api/userApi';
 import styles from './OnboardingPage.module.css';
@@ -18,8 +18,15 @@ const MAX_SELECT = 3;
 const OnboardingPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.user);
   const [selected, setSelected] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (user?.onboardingCompleted === true) {
+      navigate('/', { replace: true });
+    }
+  }, [user, navigate]);
 
   const toggleGenre = (id) => {
     setSelected((prev) => {
