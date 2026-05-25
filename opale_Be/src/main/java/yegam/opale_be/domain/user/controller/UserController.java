@@ -11,6 +11,7 @@ import yegam.opale_be.domain.user.dto.request.*;
 import yegam.opale_be.domain.user.dto.response.CheckNicknameResponseDto;
 import yegam.opale_be.domain.user.dto.response.UserResponseDto;
 import yegam.opale_be.domain.user.dto.response.PasswordResetResponseDto;
+import yegam.opale_be.domain.user.service.OnboardingService;
 import yegam.opale_be.domain.user.service.UserService;
 import yegam.opale_be.global.exception.CustomException;
 import yegam.opale_be.global.exception.GlobalErrorCode;
@@ -37,6 +38,7 @@ import yegam.opale_be.global.response.BaseResponse;
 public class UserController {
 
   private final UserService userService;
+  private final OnboardingService onboardingService;
 
 
   /**
@@ -158,6 +160,21 @@ public class UserController {
     // 이메일을 보내면 그 이메일로 임시 비밀번호를 보내줌.
     PasswordResetResponseDto response = userService.resetPassword(dto);
     return ResponseEntity.ok(BaseResponse.success("임시 비밀번호가 발급되었습니다.", response));
+  }
+
+
+  /**
+   * 온보딩 장르 선택 완료 (또는 건너뛰기)
+   */
+  @Operation(summary = "온보딩 완료", description = "회원가입 후 선호 장르를 선택하거나 건너뜁니다. genres 빈 배열 = 건너뛰기")
+  @PostMapping("/onboarding")
+  public ResponseEntity<BaseResponse<String>> completeOnboarding(
+      @AuthenticationPrincipal Long userId,
+      @RequestBody @Valid OnboardingRequestDto dto
+  ) {
+    if (userId == null) throw new CustomException(GlobalErrorCode.UNAUTHORIZED);
+    onboardingService.completeOnboarding(userId, dto);
+    return ResponseEntity.ok(BaseResponse.success("온보딩이 완료되었습니다.", null));
   }
 
 

@@ -52,6 +52,7 @@ public class UserMapper {
         .address2(user.getAddress2())
         .role(user.getRole().name())
         .createdAt(user.getCreatedAt())
+        .onboardingCompleted(user.getOnboardingCompleted())
         .build();
   }
 

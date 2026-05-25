@@ -68,10 +68,15 @@ public class User extends BaseTimeEntity {
 
   private LocalDateTime deletedAt;
 
+  @Builder.Default
+  @Column(nullable = false, columnDefinition = "boolean default true")
+  private Boolean onboardingCompleted = false;
+
   @PrePersist
   public void prePersist() {
     if (role == null) role = Role.USER;
     if (isDeleted == null) isDeleted = false;
+    if (onboardingCompleted == null) onboardingCompleted = false;
   }
 
   public enum Role {
