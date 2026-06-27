@@ -229,6 +229,11 @@
   border: 1px solid #c8e6c9;
 }
 
+.chatbotButton {
+  background: linear-gradient(135deg, #f0f4ff 0%, #e8eeff 100%);
+  border: 1px solid #c7d2fe;
+}
+
 .ctaText {
   font-size: 16px;
   font-weight: 500;

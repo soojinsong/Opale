@@ -72,7 +72,8 @@ public class SecurityConfig {
                 "/api/places/**",
                 "/api/discounts/**",
                 "/ws/**",
-                "/api/search/**"
+                "/api/search/**",
+                "/api/chatbot/**"
             ).permitAll() 
 
             .requestMatchers("/api/admin/performances/**").permitAll()
