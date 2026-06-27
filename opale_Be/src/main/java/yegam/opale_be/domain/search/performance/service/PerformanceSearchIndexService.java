@@ -150,6 +150,40 @@ public class PerformanceSearchIndexService {
     }
   }
 
+  /** 챗봇 전용: 자연어 키워드로 공연 ID 목록 반환 (title + aiSummary + aiKeywords + genrenm + placeName 멀티필드) */
+  @Transactional(readOnly = true)
+  public List<String> searchForChatbot(String keyword) {
+
+    NativeQuery query = NativeQuery.builder()
+        .withQuery(q -> q
+            .bool(b -> b
+                .should(s -> s.matchPhrasePrefix(m -> m.field("title").query(keyword).boost(5.0f)))
+                .should(s -> s.match(m -> m.field("title").query(keyword).fuzziness("AUTO").boost(2.0f)))
+                .should(s -> s.match(m -> m.field("aiSummary").query(keyword).boost(3.0f)))
+                .should(s -> s.match(m -> m.field("aiKeywords").query(keyword).boost(2.0f)))
+                .should(s -> s.match(m -> m.field("genrenm").query(keyword).boost(1.5f)))
+                .should(s -> s.match(m -> m.field("placeName").query(keyword).boost(1.0f)))
+            )
+        )
+        .withMaxResults(5)
+        .build();
+
+    try {
+      SearchHits<PerformanceSearchDocument> hits =
+          elasticsearchOperations.search(query, PerformanceSearchDocument.class);
+      return hits.getSearchHits()
+          .stream()
+          .map(hit -> hit.getContent().getPerformanceId())
+          .toList();
+    } catch (Exception e) {
+      log.warn("ES searchForChatbot() 실패, MySQL fallback: {}", e.getMessage());
+      return performanceRepository.search(null, keyword, null, null, PageRequest.of(0, 5))
+          .getContent().stream()
+          .map(Performance::getPerformanceId)
+          .toList();
+    }
+  }
+
   /** 공연 검색 목록 페이지: 정확도 순 performanceId 리스트 반환(ES), 이후 DB에서 실제 데이터를 조회하기 위한 용도 */
   @Transactional(readOnly = true)
   public List<String> searchIdsByAccuracy(String keyword, int page, int size) {
