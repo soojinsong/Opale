@@ -15,6 +15,15 @@ services:
     ports:
       - "3306:3306"
 
+  opale-redis:
+    image: redis:7-alpine
+    container_name: opale-redis
+    restart: always
+    networks:
+      - opale-net
+    volumes:
+      - /home/ec2-user/redis-data:/data
+
   opale-be:
     build:
       context: .
@@ -23,6 +32,7 @@ services:
     restart: always
     depends_on:
       - mysql-opale
+      - opale-redis
     networks:
       - opale-net
     ports:

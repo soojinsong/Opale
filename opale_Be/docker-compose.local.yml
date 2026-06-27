@@ -1,0 +1,44 @@
+version: "3.9"
+
+services:
+  mysql-opale:
+    image: mysql:8
+    container_name: mysql-opale
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: "1234"
+      MYSQL_DATABASE: "opale_db"
+    networks:
+      - opale-net
+    volumes:
+      - ./mysql-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  opale-redis:
+    image: redis:7-alpine
+    container_name: opale-redis
+    restart: always
+    networks:
+      - opale-net
+    ports:
+      - "6379:6379"
+
+  opale-es:
+    image: elasticsearch:8.11.1
+    container_name: opale-es
+    restart: always
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    networks:
+      - opale-net
+    ports:
+      - "9200:9200"
+    volumes:
+      - ./es-data:/usr/share/elasticsearch/data
+
+networks:
+  opale-net:
+    driver: bridge
