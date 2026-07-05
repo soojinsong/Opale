@@ -10,7 +10,10 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
  * @param {function} callbacks.onDone - 스트리밍 완료 시
  * @param {function} callbacks.onError - 오류 발생 시 (error: Error)
  */
-export const streamChatbotMessage = async (message, { onChunk, onPerformances, onDone, onError } = {}) => {
+export const streamChatbotMessage = async (
+  message,
+  { onChunk, onPerformances, onDone, onError } = {},
+) => {
   try {
     let token = localStorage.getItem("accessToken");
     if (token) token = token.replace(/^Bearer\s+/i, "").trim();
@@ -18,7 +21,7 @@ export const streamChatbotMessage = async (message, { onChunk, onPerformances, o
     const headers = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
-    const response = await fetch(`${API_BASE_URL}/api/chatbot/message`, {
+    const response = await fetch(`${API_BASE_URL}/chatbot/message`, {
       method: "POST",
       headers,
       body: JSON.stringify({ message }),
