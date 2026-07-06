@@ -56,6 +56,9 @@ public class ChatbotQueryRouterService {
           조건:
           - 오직 JSON 객체만 반환
           - 절대 설명, 백틱, 추가 텍스트 넣지 마라
+          - keyword는 반드시 사용자가 입력한 원문 그대로의 언어/표기를 유지해라.
+            절대 번역하거나 영문/외래어 표기로 정규화하지 마라.
+            (예: 사용자가 "위키드"라고 썼으면 keyword도 "위키드"여야 하고, "Wicked"로 바꾸면 안 된다)
 
           [질의]
           """ + message;
