@@ -97,11 +97,13 @@ public class ChatbotAnswerService {
 
   private String buildSystemPrompt(List<ChatbotPerformanceDto> performances) {
     StringBuilder sb = new StringBuilder();
-    sb.append("당신은 공연 안내 챗봇입니다. 아래 공연 정보를 참고하여 사용자의 질문에 친절하고 자연스럽게 답변해주세요.\n");
+    sb.append("당신은 공연 안내 챗봇입니다. 아래 [공연 정보]에 있는 내용만 근거로 답변해주세요.\n");
+    sb.append("[공연 정보]에 없는 내용은 당신이 알고 있더라도 절대 답변에 포함하지 마세요.\n");
+    sb.append("[공연 정보]로 답할 수 없는 질문이면 모른다고 솔직히 안내하고, 다른 키워드로 검색해보라고 제안하세요.\n");
     sb.append("답변은 반드시 한국어로 해주세요.\n\n");
 
     if (performances.isEmpty()) {
-      sb.append("[공연 정보]\n관련 공연 정보를 찾지 못했습니다. 다른 키워드로 검색해보세요.");
+      sb.append("[공연 정보]\n검색된 공연 정보가 없습니다. 이 경우 절대 다른 공연을 지어내거나 알고 있는 지식으로 답하지 말고, 관련 공연을 찾지 못했다고 안내하세요.");
     } else {
       sb.append("[공연 정보]\n");
       for (int i = 0; i < performances.size(); i++) {
