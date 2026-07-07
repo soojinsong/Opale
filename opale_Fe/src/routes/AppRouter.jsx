@@ -45,6 +45,7 @@ import PerformanceSignalPage from '../pages/recommand/PerformanceSignalPage';
 import KeywordPerformancePage from '../pages/recommand/KeywordPerformancePage';
 
 import MainAdminPage from '../pages/admin/MainAdminPage';
+import DashboardAdminPage from '../pages/admin/DashboardAdminPage';
 import PerformanceAdminPage from '../pages/admin/PerformanceAdminPage';
 import HomeBannerAdminPage from '../pages/admin/HomeBannerAdminPage';
 import PerformanceBannerAdminPage from '../pages/admin/PerformanceBannerAdminPage';
@@ -103,6 +104,7 @@ const AppRouter = () => {
           <Route path="recommend/keyword" element={<KeywordPerformancePage />} />
 
           <Route path="admin" element={<MainAdminPage />} />
+          <Route path="admin/dashboard" element={<DashboardAdminPage />} />
           <Route path="admin/performance" element={<PerformanceAdminPage />} />
           <Route path="admin/banner/home" element={<HomeBannerAdminPage />} />
           <Route path="admin/banner/performance" element={<PerformanceBannerAdminPage />} />
