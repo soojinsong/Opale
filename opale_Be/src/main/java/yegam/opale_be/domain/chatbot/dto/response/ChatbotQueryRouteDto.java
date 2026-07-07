@@ -13,4 +13,6 @@ public class ChatbotQueryRouteDto {
 
   private String queryType;
   private String keyword;
+  private String place;
+  private String genre;
 }
