@@ -153,6 +153,21 @@
 }
 
 .rankKeyword {
+  flex: 1;
   font-size: 14px;
   color: #333;
+  word-break: break-all;
+}
+
+.rankValue {
+  flex-shrink: 0;
+  margin-left: 12px;
+  font-size: 13px;
+  color: #898781;
+}
+
+.emptyText {
+  font-size: 14px;
+  color: #898781;
+  padding: 8px 0;
 }
