@@ -71,7 +71,9 @@ public class ChatbotAnswerService {
                   if ("[DONE]".equals(data)) break;
                   String chunk = extractContent(data);
                   if (chunk != null && !chunk.isEmpty()) {
-                    emitter.send(SseEmitter.event().name("chunk").data(chunk));
+                    // SSE data 필드는 원본 개행을 그대로 실으면 줄 구분자로 오인돼 유실됨 → 이스케이프해서 전송
+                    String escaped = chunk.replace("\n", "\\n");
+                    emitter.send(SseEmitter.event().name("chunk").data(escaped));
                   }
                 }
               }
@@ -100,6 +102,16 @@ public class ChatbotAnswerService {
     sb.append("당신은 공연 안내 챗봇입니다. 아래 [공연 정보]에 있는 내용만 근거로 답변해주세요.\n");
     sb.append("[공연 정보]에 없는 내용은 당신이 알고 있더라도 절대 답변에 포함하지 마세요.\n");
     sb.append("[공연 정보]로 답할 수 없는 질문이면 모른다고 솔직히 안내하고, 다른 키워드로 검색해보라고 제안하세요.\n");
+    sb.append("[공연 정보]에 공연이 하나라도 있으면, 있다고 확실하게 답변하세요 — 사용자가 쓴 표현과 글자가 달라도 ")
+        .append("(예: 사용자는 '혜화'라고 했는데 공연 정보엔 '대학로'로만 나와도) 같은 지역/조건으로 이미 검색된 결과이니 그대로 신뢰하고 안내하세요.\n");
+    sb.append("[공연 정보] 항목은 화면에 카드로 이미 전부 표시됩니다. 답변에서는 각 공연을 번호 매겨 전부 나열하지 말고, ")
+        .append("몇 건을 찾았는지와 간단한 특징만 1~2문장으로 요약하고 '아래 목록에서 확인해보세요' 식으로 안내하세요.\n");
+    sb.append("단, 사용자가 예매 방법이나 예매 링크를 구체적으로 물어보면, 해당 공연의 [예매처] 항목에 있는 ")
+        .append("예매처 이름과 링크를 답변에 그대로 포함해서 안내하세요. 예매처가 '등록된 예매처 정보 없음'이면 ")
+        .append("모른다고 솔직히 안내하세요.\n")
+        .append("예매처가 여러 개면 한 문단에 이어 쓰지 말고, 예매처마다 줄바꿈해서 하나씩 나열하세요. ")
+        .append("사이트명 자체를 마크다운 링크로 감싸고, 그 뒤에 실제 URL도 그대로 적어주세요 ")
+        .append("(형식: \"- [사이트명](URL) — URL\" 줄마다 반복. 예: \"- [예스24](https://ticket.yes24.com/Perf/1) — https://ticket.yes24.com/Perf/1\").\n");
     sb.append("답변은 반드시 한국어로 해주세요.\n\n");
 
     if (performances.isEmpty()) {
@@ -112,7 +124,18 @@ public class ChatbotAnswerService {
             .append("공연명: ").append(p.getTitle()).append("\n")
             .append("   장르: ").append(p.getGenrenm()).append("\n")
             .append("   공연장: ").append(p.getPlaceName()).append("\n")
-            .append("   기간: ").append(p.getStartDate()).append(" ~ ").append(p.getEndDate()).append("\n\n");
+            .append("   기간: ").append(p.getStartDate()).append(" ~ ").append(p.getEndDate()).append("\n");
+
+        if (p.getBookingSites() != null && !p.getBookingSites().isEmpty()) {
+          sb.append("   예매처: ");
+          sb.append(p.getBookingSites().stream()
+              .map(site -> site.getSiteName() + "(" + site.getSiteUrl() + ")")
+              .collect(java.util.stream.Collectors.joining(", ")));
+          sb.append("\n");
+        } else {
+          sb.append("   예매처: 등록된 예매처 정보 없음\n");
+        }
+        sb.append("\n");
       }
     }
 
