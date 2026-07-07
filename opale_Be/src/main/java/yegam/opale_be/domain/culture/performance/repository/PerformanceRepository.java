@@ -57,6 +57,19 @@ public interface PerformanceRepository extends JpaRepository<Performance, String
   /** 최신순 Top10 (임시 인기 대용) */
   List<Performance> findTop10ByOrderByUpdatedateDesc();
 
+  /** 대시보드: 조회수 Top5 */
+  List<Performance> findTop5ByOrderByViewCountDesc();
+
+  /** 대시보드: 장르별 공연 수 분포 */
+  @Query("""
+      SELECT p.genrenm, COUNT(p)
+      FROM Performance p
+      WHERE p.genrenm IS NOT NULL
+      GROUP BY p.genrenm
+      ORDER BY COUNT(p) DESC
+      """)
+  List<Object[]> countGroupByGenre();
+
   // ---------------------------------------------------------------------
 
   /** 예매처 전용 Fetch Join */

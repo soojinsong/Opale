@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
 import ContentsLayout from '../layouts/ContentsLayout';
 import ScrollToTop from '../components/common/ScrollToTop';
+import RequireAdmin from '../components/common/RequireAdmin';
 
 import MainHomePage from '../pages/home/MainHomePage';
 
@@ -45,6 +46,7 @@ import PerformanceSignalPage from '../pages/recommand/PerformanceSignalPage';
 import KeywordPerformancePage from '../pages/recommand/KeywordPerformancePage';
 
 import MainAdminPage from '../pages/admin/MainAdminPage';
+import DashboardAdminPage from '../pages/admin/DashboardAdminPage';
 import PerformanceAdminPage from '../pages/admin/PerformanceAdminPage';
 import HomeBannerAdminPage from '../pages/admin/HomeBannerAdminPage';
 import PerformanceBannerAdminPage from '../pages/admin/PerformanceBannerAdminPage';
@@ -102,11 +104,14 @@ const AppRouter = () => {
           <Route path="recommend/my-ticket" element={<Navigate to="/my/tickets" replace />} />
           <Route path="recommend/keyword" element={<KeywordPerformancePage />} />
 
-          <Route path="admin" element={<MainAdminPage />} />
-          <Route path="admin/performance" element={<PerformanceAdminPage />} />
-          <Route path="admin/banner/home" element={<HomeBannerAdminPage />} />
-          <Route path="admin/banner/performance" element={<PerformanceBannerAdminPage />} />
-          <Route path="admin/banner/content" element={<ContentBannerAdminPage />} />
+          <Route element={<RequireAdmin />}>
+            <Route path="admin" element={<MainAdminPage />} />
+            <Route path="admin/dashboard" element={<DashboardAdminPage />} />
+            <Route path="admin/performance" element={<PerformanceAdminPage />} />
+            <Route path="admin/banner/home" element={<HomeBannerAdminPage />} />
+            <Route path="admin/banner/performance" element={<PerformanceBannerAdminPage />} />
+            <Route path="admin/banner/content" element={<ContentBannerAdminPage />} />
+          </Route>
         </Route>
 
         <Route path="/culture/:id" element={<ContentsLayout><DetailPerformancePage /></ContentsLayout>} />

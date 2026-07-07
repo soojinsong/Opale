@@ -10,6 +10,7 @@ import yegam.opale_be.domain.culture.performance.dto.request.PerformanceSearchRe
 import yegam.opale_be.domain.culture.performance.dto.response.detail.*;
 import yegam.opale_be.domain.culture.performance.dto.response.list.*;
 import yegam.opale_be.domain.culture.performance.service.PerformanceService;
+import yegam.opale_be.domain.search.performance.service.SearchKeywordLogService;
 import yegam.opale_be.global.common.BasePerformanceListResponseDto;
 import yegam.opale_be.global.response.BaseResponse;
 
@@ -36,6 +37,7 @@ import yegam.opale_be.global.response.BaseResponse;
 public class PerformanceController {
 
   private final PerformanceService performanceService;
+  private final SearchKeywordLogService searchKeywordLogService;
 
 
   /**
@@ -49,6 +51,7 @@ public class PerformanceController {
   public ResponseEntity<BaseResponse<PerformanceListResponseDto>> getPerformanceList(
       @RequestBody @Valid PerformanceSearchRequestDto dto
   ) {
+    searchKeywordLogService.record(dto.getKeyword());
     PerformanceListResponseDto response = performanceService.getPerformanceList(dto);
     return ResponseEntity.ok(BaseResponse.success("공연 목록 조회 성공", response));
   }

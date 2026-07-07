@@ -1,0 +1,173 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+  min-height: 100vh;
+}
+
+.breadcrumb {
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: #666;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.breadcrumbLink {
+  color: #333;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.breadcrumbLink:hover {
+  color: #ffb6c1;
+  text-decoration: underline;
+}
+
+.breadcrumbSeparator {
+  margin: 0 8px;
+  color: #999;
+}
+
+.breadcrumbCurrent {
+  color: #333;
+  font-weight: 500;
+}
+
+.header {
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 8px 0;
+}
+
+.subtitle {
+  font-size: 16px;
+  color: #666;
+  margin: 0;
+}
+
+.noticeBanner {
+  background-color: #fff8e6;
+  border-left: 3px solid #fab219;
+  color: #52514e;
+  font-size: 13px;
+  padding: 10px 14px;
+  border-radius: 4px;
+  margin-bottom: 28px;
+}
+
+.kpiRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 36px;
+}
+
+.statTile {
+  background-color: #fff5f7;
+  border: 1px solid #ffe4ea;
+  border-radius: 10px;
+  padding: 18px 20px;
+}
+
+.statLabel {
+  font-size: 13px;
+  color: #52514e;
+  margin-bottom: 8px;
+}
+
+.statValue {
+  font-size: 26px;
+  font-weight: 600;
+  color: #0b0b0b;
+}
+
+.section {
+  margin-bottom: 36px;
+}
+
+.sectionTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 16px 0;
+}
+
+.chartGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.chartCard {
+  background-color: #fcfcfb;
+  border: 1px solid #e1e0d9;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.chartTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 12px 0;
+}
+
+.rankList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rankItem {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.rankItem:last-child {
+  border-bottom: none;
+}
+
+.rankNumber {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: #ffb6c1;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.rankKeyword {
+  flex: 1;
+  font-size: 14px;
+  color: #333;
+  word-break: break-all;
+}
+
+.rankValue {
+  flex-shrink: 0;
+  margin-left: 12px;
+  font-size: 13px;
+  color: #898781;
+}
+
+.emptyText {
+  font-size: 14px;
+  color: #898781;
+  padding: 8px 0;
+}
