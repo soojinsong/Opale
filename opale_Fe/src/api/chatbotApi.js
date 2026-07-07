@@ -48,12 +48,13 @@ export const streamChatbotMessage = async (
         if (line.startsWith("event:")) {
           eventName = line.substring(6).trim();
         } else if (line.startsWith("data:")) {
-          const data = line.substring(5).trim();
+          const data = line.substring(5).replace(/\r$/, "");
           if (eventName === "chunk") {
-            onChunk?.(data);
+            // BE가 SSE 프레이밍 유실을 막기 위해 개행을 \n으로 이스케이프해서 보냄 → 복원
+            onChunk?.(data.replace(/\\n/g, "\n"));
           } else if (eventName === "performances") {
             try {
-              onPerformances?.(JSON.parse(data));
+              onPerformances?.(JSON.parse(data.trim()));
             } catch {
               // JSON 파싱 실패 시 무시
             }

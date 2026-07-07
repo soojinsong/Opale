@@ -4,6 +4,59 @@ import styles from './ChatbotPage.module.css';
 import { streamChatbotMessage } from '../../api/chatbotApi';
 import defaultPoster from '../../assets/poster/wicked.gif';
 
+// 마크다운 링크([텍스트](url))만 클릭 가능하게 만든다. 평문 URL은 일부러 링크로 안 바꾼다 —
+// 사용자가 원문 URL을 그대로 눈으로 확인/복사할 수 있게 남겨두기 위함.
+const LINK_PATTERN = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
+
+const renderTextWithLinks = (text) => {
+  return text.split('\n').map((line, lineIdx, lines) => {
+    const parts = [];
+    let lastIndex = 0;
+    let match;
+    LINK_PATTERN.lastIndex = 0;
+
+    while ((match = LINK_PATTERN.exec(line)) !== null) {
+      if (match.index > lastIndex) {
+        parts.push(line.slice(lastIndex, match.index));
+      }
+      const [, linkText, url] = match;
+      parts.push(
+        <a
+          key={`${lineIdx}-${match.index}`}
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.chatLink}
+        >
+          {linkText}
+        </a>
+      );
+      lastIndex = LINK_PATTERN.lastIndex;
+    }
+    if (lastIndex < line.length) {
+      parts.push(line.slice(lastIndex));
+    }
+
+    return (
+      <span key={lineIdx}>
+        {parts}
+        {lineIdx < lines.length - 1 && <br />}
+      </span>
+    );
+  });
+};
+
+// 스트리밍 도중엔 마크다운 링크가 완성되기 전 URL이 그대로 보였다가 링크로 확 바뀌는 게 어색해서
+// 스트리밍 중에는 링크 파싱 없이 평문으로만 보여주고, 메시지가 확정된 뒤에만 renderTextWithLinks를 적용한다.
+const renderPlainText = (text) => {
+  return text.split('\n').map((line, lineIdx, lines) => (
+    <span key={lineIdx}>
+      {line}
+      {lineIdx < lines.length - 1 && <br />}
+    </span>
+  ));
+};
+
 const INITIAL_MESSAGE = {
   type: 'bot',
   text: '안녕하세요! 공연에 대해 무엇이든 물어보세요.\n예) "혜화에서 하는 연극 추천해줘", "데이트할 때 좋은 뮤지컬"',
@@ -91,9 +144,7 @@ const ChatbotPage = () => {
             )}
             <div className={styles.messageContent}>
               <div className={msg.type === 'user' ? styles.bubbleUser : styles.bubbleBot}>
-                {msg.text.split('\n').map((line, i) => (
-                  <span key={i}>{line}{i < msg.text.split('\n').length - 1 && <br />}</span>
-                ))}
+                {renderTextWithLinks(msg.text)}
               </div>
               {msg.performances.length > 0 && (
                 <div className={styles.performanceList}>
@@ -127,7 +178,7 @@ const ChatbotPage = () => {
             <div className={styles.botAvatar}>🎭</div>
             <div className={styles.messageContent}>
               <div className={styles.bubbleBot}>
-                {streamingText || <span className={styles.typing}><span /><span /><span /></span>}
+                {streamingText ? renderPlainText(streamingText) : <span className={styles.typing}><span /><span /><span /></span>}
               </div>
               {streamingPerformances.length > 0 && (
                 <div className={styles.performanceList}>

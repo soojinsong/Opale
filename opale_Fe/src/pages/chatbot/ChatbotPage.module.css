@@ -99,6 +99,17 @@
   word-break: break-word;
 }
 
+.chatLink {
+  color: #4f46e5;
+  font-weight: 600;
+  text-decoration: underline;
+  word-break: break-all;
+}
+
+.chatLink:hover {
+  color: #4338ca;
+}
+
 /* 타이핑 인디케이터 */
 .typing {
   display: flex;
