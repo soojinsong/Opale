@@ -5,6 +5,7 @@ on:
     branches: [ main ]
     paths:
       - 'docker-compose.es.yml'
+      - 'Dockerfile.es'
 
 jobs:
   deploy-es:
@@ -14,13 +15,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Upload docker-compose.es.yml to ES EC2
+      - name: Upload docker-compose.es.yml and Dockerfile.es to ES EC2
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_ES_HOST }}
           username: ec2-user
           key: ${{ secrets.EC2_ES_SSH_KEY }}
-          source: "docker-compose.es.yml"
+          source: "docker-compose.es.yml,Dockerfile.es"
           target: "/home/ec2-user/opale_es"
           overwrite: true
 
@@ -35,7 +36,7 @@ jobs:
             cd /home/ec2-user/opale_es
 
             echo "🚀 Elasticsearch 컨테이너 시작"
-            docker-compose -f docker-compose.es.yml up -d
+            docker-compose -f docker-compose.es.yml up -d --build
 
             echo "🔎 컨테이너 상태:"
             docker ps -a

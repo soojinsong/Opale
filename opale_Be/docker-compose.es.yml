@@ -2,7 +2,9 @@ version: "3.9"
 
 services:
   opale-es:
-    image: elasticsearch:8.11.1
+    build:
+      context: .
+      dockerfile: Dockerfile.es
     container_name: opale-es
     restart: always
     environment:

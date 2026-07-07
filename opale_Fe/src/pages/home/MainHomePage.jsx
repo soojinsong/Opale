@@ -361,12 +361,20 @@ const MainHomePage = () => {
           <div className={styles.ctaText}>나랑 가까운 공연 바로가기</div>
         </div>
         
-        <div 
+        <div
           className={`${styles.ctaButton} ${styles.signalButton}`}
           onClick={() => navigate('/recommend/signal')}
         >
           <div className={styles.ctaTitle}>나와 맞는 공연은?</div>
           <div className={styles.ctaSubtitle}>나랑 찰떡콩떡 공연 찾으러 가기</div>
+        </div>
+
+        <div
+          className={`${styles.ctaButton} ${styles.chatbotButton}`}
+          onClick={() => navigate('/chatbot')}
+        >
+          <div className={styles.ctaTitle}>공연이 궁금할 땐? 챗봇한테 물어봐</div>
+          <div className={styles.ctaSubtitle}>뮤지컬, 연극, 데이트 공연 뭐든 물어봐!</div>
         </div>
       </section>
       {!loadingContentBanners && displayContentBannerItems.length > 0 && (

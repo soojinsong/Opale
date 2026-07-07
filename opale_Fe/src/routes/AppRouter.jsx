@@ -38,6 +38,7 @@ import DetailPlacePage from '../pages/place/DetailPlacePage';
 import MainChatPage from '../pages/chat/MainChatPage';
 import SearchChatPage from '../pages/chat/SearchChatPage';
 import RoomPage from '../pages/chat/RoomPage';
+import ChatbotPage from '../pages/chatbot/ChatbotPage';
 
 import MainRecommandPage from '../pages/recommand/MainRecommandPage';
 import PerformanceSignalPage from '../pages/recommand/PerformanceSignalPage';
@@ -92,6 +93,7 @@ const AppRouter = () => {
 
           <Route path="chat" element={<MainChatPage />} />
           <Route path="chat/search" element={<SearchChatPage />} />
+          <Route path="chatbot" element={<ChatbotPage />} />
 
           <Route path="recommend" element={<MainRecommandPage />} />
           <Route path="recommend/signal" element={<PerformanceSignalPage />} />
