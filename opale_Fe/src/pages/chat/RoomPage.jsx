@@ -145,7 +145,10 @@ const RoomPage = () => {
       subscriptionRef.current = subscribeRoom(id, (msg) => {
         setMessages((prev) => {
           const existingIndex = prev.findIndex(
-            (m) => m.id != null && msg.id != null && String(m.id) === String(msg.id)
+            (m) =>
+              m.messageId != null &&
+              msg.messageId != null &&
+              String(m.messageId) === String(msg.messageId)
           );
           if (existingIndex !== -1) return prev;
 
@@ -338,11 +341,6 @@ const RoomPage = () => {
               </div>
               
               {group.messages.map((m, i) => {
-                const globalIndex = messages.findIndex(
-                  (msg) => (msg.id && m.id && String(msg.id) === String(m.id)) ||
-                           (msg === m)
-                );
-                
                 const senderId = m.userId || m.user?.userId;
                 const isMine = Number(senderId) === Number(currentUserId);
                 const time = m.sentAt
@@ -360,14 +358,22 @@ const RoomPage = () => {
                 const showNickname = !isMine && (!isSameUser || i === 0);
 
                 return isMine ? (
-                  <MyMessage key={m.id || `group-${groupIndex}-${i}`} text={m.message || m.contents} time={time} />
+                  <MyMessage
+                    key={m.messageId || m.id || `group-${groupIndex}-${i}`}
+                    text={m.message || m.contents}
+                    time={time}
+                    hiddenByReport={m.hiddenByReport}
+                  />
                 ) : (
-                  <OtherMessage 
-                    key={m.id || `group-${groupIndex}-${i}`} 
-                    text={m.message || m.contents} 
+                  <OtherMessage
+                    key={m.messageId || m.id || `group-${groupIndex}-${i}`}
+                    messageId={m.messageId}
+                    senderId={senderId}
+                    text={m.message || m.contents}
                     time={time}
                     nickname={nickname}
                     showNickname={showNickname}
+                    hiddenByReport={m.hiddenByReport}
                   />
                 );
               })}
