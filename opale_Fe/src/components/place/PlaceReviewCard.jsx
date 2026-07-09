@@ -1,22 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import styles from './PlaceReviewCard.module.css';
 import { isPlaceReviewLiked, togglePlaceReviewFavorite } from '../../api/favoriteApi';
+import ReportModal from '../common/ReportModal';
 
 const PlaceReviewCard = ({
   id,
   title,
+  performanceDate,
+  performanceTime,
+  seat,
+  placeName,
   rating,
   content,
   author,
-  date
+  date,
+  userId,
+  currentUserId,
+  onEdit,
+  onDelete,
+  hiddenByReport
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
+  const [isReportOpen, setIsReportOpen] = useState(false);
 
   useEffect(() => {
+    if (hiddenByReport || !id) return;
+
     const loadFavoriteStatus = async () => {
-      if (!id) return;
-      
       try {
         const liked = await isPlaceReviewLiked(id);
         setIsLiked(liked);
@@ -27,7 +38,16 @@ const PlaceReviewCard = ({
     };
 
     loadFavoriteStatus();
-  }, [id]);
+  }, [id, hiddenByReport]);
+
+  if (hiddenByReport) {
+    return (
+      <div className={styles.reviewItem}>
+        <p className={styles.hiddenNotice}>신고 처리된 리뷰입니다.</p>
+        <span className={styles.reviewAuthor}>{author} | {date}</span>
+      </div>
+    );
+  }
 
   const shouldShowMoreButton = content.length > 150;
 
@@ -51,6 +71,22 @@ const PlaceReviewCard = ({
       <div className={styles.reviewHeader}>
         <h5 className={styles.reviewTitle}>{title}</h5>
         <div className={styles.reviewMeta}>
+          {(placeName || performanceDate || seat) && (
+            <div className={styles.ticketInfo}>
+              {placeName && (
+                <span className={styles.ticketItem}>{placeName}</span>
+              )}
+              {performanceDate && (
+                <span className={styles.ticketItem}>
+                  {performanceDate}
+                  {performanceTime && ` ${performanceTime}`}
+                </span>
+              )}
+              {seat && (
+                <span className={styles.ticketItem}>{seat}</span>
+              )}
+            </div>
+          )}
           <div className={styles.reviewRating}>
             {[...Array(5)].map((_, i) => (
               <span 
@@ -84,7 +120,7 @@ const PlaceReviewCard = ({
       
       <div className={styles.reviewFooter}>
         <div className={styles.reviewFooterLeft}>
-          <button 
+          <button
             className={`${styles.likeButton} ${isLiked ? styles.liked : ''}`}
             onClick={toggleLike}
           >
@@ -92,7 +128,52 @@ const PlaceReviewCard = ({
           </button>
           <span className={styles.reviewAuthor}>{author} | {date}</span>
         </div>
+        {userId && currentUserId && userId === currentUserId ? (
+          <div className={styles.reviewActions}>
+            <button
+              className={styles.editButton}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onEdit) onEdit();
+              }}
+            >
+              수정
+            </button>
+            <button
+              className={styles.deleteButton}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onDelete) onDelete();
+              }}
+            >
+              삭제
+            </button>
+          </div>
+        ) : (
+          userId && currentUserId && (
+            <div className={styles.reviewActions}>
+              <button
+                className={styles.reportButton}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsReportOpen(true);
+                }}
+              >
+                신고
+              </button>
+            </div>
+          )
+        )}
       </div>
+
+      {isReportOpen && (
+        <ReportModal
+          targetType="PLACE_REVIEW"
+          targetId={id}
+          targetUserId={userId}
+          onClose={() => setIsReportOpen(false)}
+        />
+      )}
     </div>
   );
 };

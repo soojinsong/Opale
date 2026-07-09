@@ -20,11 +20,12 @@ import PlaceMap from '../../components/place/PlaceMap';
 import { usePlaceDetail } from '../../hooks/usePlaceDetail';
 import { usePlaceFacilities } from '../../hooks/usePlaceFacilities';
 import { usePlaceStages } from '../../hooks/usePlaceStages';
-import { fetchPlaceReviewsByPlace, createPlaceReview } from '../../api/reviewApi';
+import { fetchPlaceReviewsByPlace, createPlaceReview, updatePlaceReview, deletePlaceReview } from '../../api/reviewApi';
 import { normalizePlaceReviews } from '../../services/normalizePlaceReview';
 import { normalizePlaceReviewRequest } from '../../services/normalizePlaceReviewRequest';
 import logApi from '../../api/logApi';
 import PlaceDetailSkeleton from '../../components/common/PlaceDetailSkeleton';
+import ReviewEditModal from '../../components/common/ReviewEditModal';
 
 const DetailPlacePage = () => {
   const { id } = useParams();
@@ -37,6 +38,9 @@ const DetailPlacePage = () => {
   const [showWriteModal, setShowWriteModal] = useState(false);
   const [writeForm, setWriteForm] = useState({ title: '', content: '', rating: 5 });
   const [isStageTableOpen, setIsStageTableOpen] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingReview, setEditingReview] = useState(null);
+  const [editForm, setEditForm] = useState({ title: '', content: '', rating: 5 });
   
   const [reviews, setReviews] = useState([]);
   const [reviewsLoading, setReviewsLoading] = useState(false);
@@ -77,6 +81,59 @@ const DetailPlacePage = () => {
       });
     }
   }, [id, currentUserId]);
+
+  const handleEditReview = (review) => {
+    setEditingReview(review);
+    setEditForm({
+      title: review.title || '',
+      content: review.content || '',
+      rating: review.rating || 5
+    });
+    setShowEditModal(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setShowEditModal(false);
+    setEditingReview(null);
+    setEditForm({ title: '', content: '', rating: 5 });
+  };
+
+  const handleUpdateReview = async (e) => {
+    e.preventDefault();
+
+    if (!editingReview || !id) return;
+
+    try {
+      const reviewId = editingReview.id || editingReview.placeReviewId;
+      const updateDto = normalizePlaceReviewRequest(editForm, id);
+
+      await updatePlaceReview(reviewId, updateDto);
+
+      alert('리뷰가 수정되었습니다.');
+      handleCloseEditModal();
+
+      await loadReviews();
+    } catch (err) {
+      console.error('공연장 리뷰 수정 실패:', err);
+      alert(err.response?.data?.message || err.message || '리뷰 수정에 실패했습니다.');
+    }
+  };
+
+  const handleDeleteReview = async (reviewId) => {
+    if (!window.confirm('정말 이 리뷰를 삭제하시겠습니까?')) {
+      return;
+    }
+
+    try {
+      await deletePlaceReview(reviewId);
+      alert('리뷰가 삭제되었습니다.');
+
+      await loadReviews();
+    } catch (err) {
+      console.error('공연장 리뷰 삭제 실패:', err);
+      alert(err.response?.data?.message || err.message || '리뷰 삭제에 실패했습니다.');
+    }
+  };
 
   if (loading) {
     return <PlaceDetailSkeleton />;
@@ -279,10 +336,18 @@ const DetailPlacePage = () => {
                 key={review.id}
                 id={review.id}
                 title={review.title}
+                performanceDate={review.performanceDate}
+                performanceTime={review.performanceTime}
+                seat={review.seat}
                 rating={review.rating}
                 content={review.content}
                 author={review.author}
                 date={review.date}
+                userId={review.userId}
+                currentUserId={currentUserId}
+                onEdit={() => handleEditReview(review)}
+                onDelete={() => handleDeleteReview(review.id || review.placeReviewId)}
+                hiddenByReport={review.hiddenByReport}
               />
             ))
           )}
@@ -386,6 +451,16 @@ const DetailPlacePage = () => {
           </div>
         </div>
       )}
+
+      <ReviewEditModal
+        show={showEditModal}
+        editingReview={editingReview}
+        editForm={editForm}
+        onFormChange={setEditForm}
+        onSubmit={handleUpdateReview}
+        onClose={handleCloseEditModal}
+        styles={styles}
+      />
     </div>
   );
 };
