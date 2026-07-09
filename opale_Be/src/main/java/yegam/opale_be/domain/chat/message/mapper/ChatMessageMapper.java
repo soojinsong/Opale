@@ -14,12 +14,16 @@ public class ChatMessageMapper {
 
   /** 단일 메시지 변환 */
   public ChatMessageResponseDto toResponseDto(ChatMessage m) {
+    boolean hidden = Boolean.TRUE.equals(m.getHiddenByReport());
+
     return ChatMessageResponseDto.builder()
+        .messageId(m.getMessageId())
         .roomId(m.getChatRoom().getRoomId())
         .userId(m.getUser().getUserId())
         .nickname(m.getUser().getNickname())
-        .message(m.getContents())
+        .message(hidden ? null : m.getContents())
         .sentAt(m.getSentAt())
+        .hiddenByReport(hidden)
         .build();
   }
 

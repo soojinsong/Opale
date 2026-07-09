@@ -47,4 +47,19 @@ public class ReportDetailResponseDto {
 
   @Schema(description = "수정일시")
   private LocalDateTime updatedAt;
+
+  @Schema(description = "신고 대상 원본 콘텐츠 제목 (리뷰인 경우에만 존재)", example = "위키드 후기입니다")
+  private String targetContentTitle;
+
+  @Schema(description = "신고 대상 원본 콘텐츠 내용 (리뷰/채팅 메시지)", example = "정말 재밌게 봤어요")
+  private String targetContent;
+
+  @Schema(description = "신고 대상 원본 콘텐츠가 이미 삭제(또는 존재하지 않음)되었는지 여부", example = "false")
+  private Boolean targetContentDeleted;
+
+  @Schema(description = "신고 승인 처리로 이미 숨김 처리된 콘텐츠인지 여부", example = "false")
+  private Boolean targetContentHidden;
+
+  @Schema(description = "원본으로 이동하기 위한 ID (공연 리뷰=공연ID, 공연장 리뷰=공연장ID, 채팅 메시지=채팅방ID)", example = "PF123456")
+  private String targetNavigateId;
 }

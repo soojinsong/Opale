@@ -106,6 +106,7 @@ export const normalizePlaceReviews = (apiData) => {
       placeName: review.placeName || '',
       placeAddress: review.placeAddress || '',
       place: review.place || { name: review.placeName, address: review.placeAddress },
+      hiddenByReport: Boolean(review.hiddenByReport),
     };
   });
 };

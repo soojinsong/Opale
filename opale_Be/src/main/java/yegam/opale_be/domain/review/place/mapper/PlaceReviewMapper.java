@@ -17,6 +17,8 @@ public class PlaceReviewMapper {
   public PlaceReviewResponseDto toResponseDto(PlaceReview entity) {
     if (entity == null) return null;
 
+    boolean hidden = Boolean.TRUE.equals(entity.getHiddenByReport());
+
     return PlaceReviewResponseDto.builder()
         .placeReviewId(entity.getPlaceReviewId())
         .placeId(entity.getPlace().getPlaceId())
@@ -26,12 +28,13 @@ public class PlaceReviewMapper {
         .nickname(entity.getUser().getNickname())
         .performanceDate(entity.getTicket().getPerformanceDate())
         .seatInfo(entity.getTicket().getSeatInfo())
-        .title(entity.getTitle())
-        .contents(entity.getContents())
+        .title(hidden ? null : entity.getTitle())
+        .contents(hidden ? null : entity.getContents())
         .rating(entity.getRating())
         .reviewType(entity.getReviewType())
         .createdAt(entity.getCreatedAt())
         .updatedAt(entity.getUpdatedAt())
+        .hiddenByReport(hidden)
         .build();
   }
 

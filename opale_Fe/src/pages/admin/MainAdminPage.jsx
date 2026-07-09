@@ -50,6 +50,22 @@ const MainAdminPage = () => {
           </div>
         </Link>
 
+        <Link to="/admin/reports" className={styles.menuItem}>
+          <div className={styles.menuIcon}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          </div>
+          <span className={styles.menuText}>신고 관리</span>
+          <div className={styles.menuArrow}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </div>
+        </Link>
+
         <Link to="/admin/performance" className={styles.menuItem}>
           <div className={styles.menuIcon}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

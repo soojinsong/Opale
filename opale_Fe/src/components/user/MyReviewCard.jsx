@@ -42,6 +42,19 @@ const MyReviewCard = ({
   const author = review.author || review.user?.nickname || review.nickname || '익명';
   const date = review.date || (review.createdAt ? new Date(review.createdAt).toLocaleDateString('ko-KR') : '');
 
+  if (review.hiddenByReport) {
+    return (
+      <div className={styles.reviewWrapper}>
+        <div className={`${styles.reviewCard} ${styles.reviewCardStandalone}`}>
+          <p className={styles.hiddenNotice}>신고 처리된 리뷰입니다.</p>
+          <div className={styles.reviewFooter}>
+            <span className={styles.reviewAuthor}>{author} | {date}</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.reviewWrapper}>
       <div className={styles.reviewActions}>

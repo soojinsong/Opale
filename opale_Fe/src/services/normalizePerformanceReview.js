@@ -144,6 +144,7 @@ export const normalizePerformanceReviews = (apiData) => {
       poster: review.poster || '',
       performanceName: review.performanceTitle || review.performanceName || review.performance?.title || null,
       performance: review.performance || null,
+      hiddenByReport: Boolean(review.hiddenByReport),
     };
   });
 };

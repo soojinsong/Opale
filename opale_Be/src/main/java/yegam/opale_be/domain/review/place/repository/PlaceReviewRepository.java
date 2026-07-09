@@ -15,9 +15,9 @@ import java.util.Optional;
 public interface PlaceReviewRepository extends JpaRepository<PlaceReview, Long> {
 
   /** Soft Delete 제외 + 단건 조회 */
-  Optional<PlaceReview> findByPlaceReviewIdAndIsDeletedFalse(Long reviewId);
+  Optional<PlaceReview> findByPlaceReviewIdAndIsDeletedFalseAndHiddenByReportFalse(Long reviewId);
 
-  /** 공연장별 리뷰 목록 */
+  /** 공연장별 리뷰 목록 (신고 승인으로 숨김 처리된 리뷰도 포함 — 목록에는 자리를 남기고 내용만 리댁션됨) */
   @Query("""
       SELECT r FROM PlaceReview r
       WHERE r.place.placeId = :placeId
@@ -66,6 +66,7 @@ public interface PlaceReviewRepository extends JpaRepository<PlaceReview, Long> 
       FROM PlaceReview r
       WHERE r.place.placeId = :placeId
         AND r.isDeleted = false
+        AND r.hiddenByReport = false
         AND r.rating IS NOT NULL
   """)
   Double calculateAverageRating(@Param("placeId") String placeId);
@@ -77,6 +78,7 @@ public interface PlaceReviewRepository extends JpaRepository<PlaceReview, Long> 
       WHERE r.place.placeId = :placeId
         AND r.reviewType = :reviewType
         AND r.isDeleted = false
+        AND r.hiddenByReport = false
   """)
   Long countByPlaceIdAndType(
       @Param("placeId") String placeId,
@@ -90,6 +92,7 @@ public interface PlaceReviewRepository extends JpaRepository<PlaceReview, Long> 
       WHERE r.place.placeId = :placeId
         AND r.reviewType = :reviewType
         AND r.isDeleted = false
+        AND r.hiddenByReport = false
         AND r.rating IS NOT NULL
   """)
   Double avgRatingByPlaceIdAndType(

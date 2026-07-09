@@ -31,6 +31,8 @@ public class PerformanceReviewMapper {
       }
     }
 
+    boolean hidden = Boolean.TRUE.equals(entity.getHiddenByReport());
+
     return PerformanceReviewResponseDto.builder()
         .performanceReviewId(entity.getPerformanceReviewId())
         .performanceId(entity.getPerformance().getPerformanceId())
@@ -45,12 +47,13 @@ public class PerformanceReviewMapper {
         .performanceDate(performanceDate)
         .seatInfo(seatInfo)
 
-        .title(entity.getTitle())
-        .contents(entity.getContents())
+        .title(hidden ? null : entity.getTitle())
+        .contents(hidden ? null : entity.getContents())
         .rating(entity.getRating())
         .reviewType(entity.getReviewType())
         .createdAt(entity.getCreatedAt())
         .updatedAt(entity.getUpdatedAt())
+        .hiddenByReport(hidden)
         .build();
   }
 

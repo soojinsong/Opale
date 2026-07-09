@@ -824,6 +824,7 @@ const DetailPerformancePage = () => {
                         currentUserId={currentUserId}
                         onEdit={() => handleEditReview(review, 'AFTER')}
                         onDelete={() => handleDeleteReview(review.id || review.performanceReviewId || review.reviewId, 'AFTER')}
+                        hiddenByReport={review.hiddenByReport}
                       />
                     ))
                   )}

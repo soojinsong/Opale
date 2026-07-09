@@ -55,4 +55,7 @@ public class PlaceReviewResponseDto {
 
   @Schema(description = "수정일")
   private LocalDateTime updatedAt;
+
+  @Schema(description = "신고 승인으로 숨김 처리됐는지 여부")
+  private Boolean hiddenByReport;
 }

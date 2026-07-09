@@ -12,6 +12,9 @@ import java.time.LocalDateTime;
 @Schema(title = "ChatMessageResponse DTO", description = "채팅 메시지 전송 응답 DTO")
 public class ChatMessageResponseDto {
 
+  @Schema(description = "메시지 ID", example = "501")
+  private Long messageId;
+
   @Schema(description = "채팅방 ID", example = "1")
   private Long roomId;
 
@@ -26,4 +29,7 @@ public class ChatMessageResponseDto {
 
   @Schema(description = "메시지 전송 시각", example = "2025-11-10T21:30:00")
   private LocalDateTime sentAt;
+
+  @Schema(description = "신고 승인으로 숨김 처리됐는지 여부")
+  private Boolean hiddenByReport;
 }

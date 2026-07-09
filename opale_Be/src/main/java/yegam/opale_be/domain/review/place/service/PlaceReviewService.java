@@ -42,7 +42,7 @@ public class PlaceReviewService {
   public PlaceReviewResponseDto getReview(Long reviewId) {
 
     PlaceReview review = reviewRepository
-        .findByPlaceReviewIdAndIsDeletedFalse(reviewId)
+        .findByPlaceReviewIdAndIsDeletedFalseAndHiddenByReportFalse(reviewId)
         .orElseThrow(() -> new CustomException(PlaceReviewErrorCode.REVIEW_NOT_FOUND));
 
     return reviewMapper.toResponseDto(review);
@@ -127,7 +127,7 @@ public class PlaceReviewService {
   public PlaceReviewResponseDto updateReview(Long userId, Long reviewId, PlaceReviewRequestDto dto) {
 
     PlaceReview review = reviewRepository
-        .findByPlaceReviewIdAndIsDeletedFalse(reviewId)
+        .findByPlaceReviewIdAndIsDeletedFalseAndHiddenByReportFalse(reviewId)
         .orElseThrow(() -> new CustomException(PlaceReviewErrorCode.REVIEW_NOT_FOUND));
 
     if (!review.getUser().getUserId().equals(userId)) {
@@ -148,7 +148,7 @@ public class PlaceReviewService {
   public void deleteReview(Long userId, Long reviewId) {
 
     PlaceReview review = reviewRepository
-        .findByPlaceReviewIdAndIsDeletedFalse(reviewId)
+        .findByPlaceReviewIdAndIsDeletedFalseAndHiddenByReportFalse(reviewId)
         .orElseThrow(() -> new CustomException(PlaceReviewErrorCode.REVIEW_NOT_FOUND));
 
     if (!review.getUser().getUserId().equals(userId)) {
@@ -165,7 +165,8 @@ public class PlaceReviewService {
     updatePlaceAverageRating(placeId);
   }
 
-  private void updatePlaceAverageRating(String placeId) {
+  /** 평균 평점 갱신 (신고 승인으로 리뷰가 숨김 처리될 때도 ReportService에서 호출됨) */
+  public void updatePlaceAverageRating(String placeId) {
     Double avg = reviewRepository.calculateAverageRating(placeId);
     Place place = placeRepository.findById(placeId)
         .orElseThrow(() -> new CustomException(PlaceReviewErrorCode.PLACE_NOT_FOUND));
