@@ -76,8 +76,6 @@ public class SecurityConfig {
                 "/api/chatbot/**"
             ).permitAll() 
 
-            .requestMatchers("/api/admin/performances/**").permitAll()
-
             .requestMatchers(
                 "/api/admin/banners/**",
                 "/api/banners/main",
