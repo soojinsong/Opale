@@ -15,9 +15,9 @@ import java.util.Optional;
 public interface PerformanceReviewRepository extends JpaRepository<PerformanceReview, Long> {
 
   /** Soft Delete 단건 조회 전용 */
-  Optional<PerformanceReview> findByPerformanceReviewIdAndIsDeletedFalse(Long reviewId);
+  Optional<PerformanceReview> findByPerformanceReviewIdAndIsDeletedFalseAndHiddenByReportFalse(Long reviewId);
 
-  /** 공연별 리뷰 목록 */
+  /** 공연별 리뷰 목록 (신고 승인으로 숨김 처리된 리뷰도 포함 — 목록에는 자리를 남기고 내용만 리댁션됨) */
   @Query("""
       SELECT r FROM PerformanceReview r
       WHERE r.performance.performanceId = :performanceId
@@ -67,6 +67,7 @@ public interface PerformanceReviewRepository extends JpaRepository<PerformanceRe
       FROM PerformanceReview r
       WHERE r.performance.performanceId = :performanceId
         AND r.isDeleted = false
+        AND r.hiddenByReport = false
         AND r.rating IS NOT NULL
   """)
   Double calculateAverageRating(@Param("performanceId") String performanceId);
@@ -78,6 +79,7 @@ public interface PerformanceReviewRepository extends JpaRepository<PerformanceRe
     WHERE r.performance.performanceId = :performanceId
       AND r.reviewType = :type
       AND r.isDeleted = false
+      AND r.hiddenByReport = false
   """)
   Long countByPerformanceIdAndType(String performanceId, ReviewType type);
 

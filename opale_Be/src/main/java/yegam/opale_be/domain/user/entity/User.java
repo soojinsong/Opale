@@ -72,11 +72,17 @@ public class User extends BaseTimeEntity {
   @Column(nullable = false, columnDefinition = "boolean default true")
   private Boolean onboardingCompleted = false;
 
+  /** 이 유저가 작성자/당사자인 신고가 승인 처리된 누적 횟수 */
+  @Builder.Default
+  @Column(name = "report_approved_count", nullable = false)
+  private Integer reportApprovedCount = 0;
+
   @PrePersist
   public void prePersist() {
     if (role == null) role = Role.USER;
     if (isDeleted == null) isDeleted = false;
     if (onboardingCompleted == null) onboardingCompleted = false;
+    if (reportApprovedCount == null) reportApprovedCount = 0;
   }
 
   public enum Role {

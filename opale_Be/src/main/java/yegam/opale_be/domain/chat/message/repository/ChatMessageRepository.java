@@ -9,7 +9,7 @@ import yegam.opale_be.domain.chat.message.entity.ChatMessage;
 @Repository
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
 
-  /** 채팅방별 메시지 페이징 조회 */
+  /** 채팅방별 메시지 페이징 조회 (신고 승인으로 숨김 처리된 메시지도 포함 — 목록에는 자리를 남기고 내용만 리댁션됨) */
   Page<ChatMessage> findByChatRoom_RoomId(Long roomId, Pageable pageable);
 
   /** 사용자별 메시지 페이징 조회 */

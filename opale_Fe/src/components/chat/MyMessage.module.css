@@ -21,6 +21,12 @@
   color: #fff;
 }
 
+.hiddenMessageText {
+  font-style: italic;
+  background: #6b7280;
+  color: #e5e7eb;
+}
+
 .messageTime {
   font-size: 10px;
   color: #9ca3af;

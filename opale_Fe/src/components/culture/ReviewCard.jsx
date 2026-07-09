@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styles from './ReviewCard.module.css';
 import { isPerformanceReviewLiked, togglePerformanceReviewFavorite } from '../../api/favoriteApi';
+import ReportModal from '../common/ReportModal';
 
 const ReviewCard = ({
   id,
@@ -16,15 +17,17 @@ const ReviewCard = ({
   userId,
   currentUserId,
   onEdit,
-  onDelete
+  onDelete,
+  hiddenByReport
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
+  const [isReportOpen, setIsReportOpen] = useState(false);
 
   useEffect(() => {
+    if (hiddenByReport || !id) return;
+
     const loadFavoriteStatus = async () => {
-      if (!id) return;
-      
       try {
         const liked = await isPerformanceReviewLiked(id);
         setIsLiked(liked);
@@ -35,7 +38,16 @@ const ReviewCard = ({
     };
 
     loadFavoriteStatus();
-  }, [id]);
+  }, [id, hiddenByReport]);
+
+  if (hiddenByReport) {
+    return (
+      <div className={styles.reviewItem}>
+        <p className={styles.hiddenNotice}>신고 처리된 리뷰입니다.</p>
+        <span className={styles.reviewAuthor}>{author} | {date}</span>
+      </div>
+    );
+  }
 
   const shouldShowMoreButton = content.length > 150;
 
@@ -117,7 +129,7 @@ const ReviewCard = ({
           </button>
           <span className={styles.reviewAuthor}>{author} | {date}</span>
         </div>
-        {userId && currentUserId && userId === currentUserId && (
+        {userId && currentUserId && userId === currentUserId ? (
           <div className={styles.reviewActions}>
             <button
               className={styles.editButton}
@@ -138,8 +150,31 @@ const ReviewCard = ({
               삭제
             </button>
           </div>
+        ) : (
+          userId && currentUserId && (
+            <div className={styles.reviewActions}>
+              <button
+                className={styles.reportButton}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsReportOpen(true);
+                }}
+              >
+                신고
+              </button>
+            </div>
+          )
         )}
       </div>
+
+      {isReportOpen && (
+        <ReportModal
+          targetType="PERFORMANCE_REVIEW"
+          targetId={id}
+          targetUserId={userId}
+          onClose={() => setIsReportOpen(false)}
+        />
+      )}
     </div>
   );
 };

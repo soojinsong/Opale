@@ -42,7 +42,7 @@ public class PerformanceReviewService {
   public PerformanceReviewResponseDto getReview(Long reviewId) {
 
     PerformanceReview review = reviewRepository
-        .findByPerformanceReviewIdAndIsDeletedFalse(reviewId)
+        .findByPerformanceReviewIdAndIsDeletedFalseAndHiddenByReportFalse(reviewId)
         .orElseThrow(() -> new CustomException(PerformanceReviewErrorCode.REVIEW_NOT_FOUND));
 
     return reviewMapper.toResponseDto(review);
@@ -143,7 +143,7 @@ public class PerformanceReviewService {
   public PerformanceReviewResponseDto updateReview(Long userId, Long reviewId, PerformanceReviewRequestDto dto) {
 
     PerformanceReview review = reviewRepository
-        .findByPerformanceReviewIdAndIsDeletedFalse(reviewId)
+        .findByPerformanceReviewIdAndIsDeletedFalseAndHiddenByReportFalse(reviewId)
         .orElseThrow(() -> new CustomException(PerformanceReviewErrorCode.REVIEW_NOT_FOUND));
 
     if (!review.getUser().getUserId().equals(userId)) {
@@ -181,7 +181,7 @@ public class PerformanceReviewService {
   public void deleteReview(Long userId, Long reviewId) {
 
     PerformanceReview review = reviewRepository
-        .findByPerformanceReviewIdAndIsDeletedFalse(reviewId)
+        .findByPerformanceReviewIdAndIsDeletedFalseAndHiddenByReportFalse(reviewId)
         .orElseThrow(() -> new CustomException(PerformanceReviewErrorCode.REVIEW_NOT_FOUND));
 
     if (!review.getUser().getUserId().equals(userId)) {
@@ -198,8 +198,8 @@ public class PerformanceReviewService {
     updatePerformanceAverageRating(performanceId);
   }
 
-  /** 평균 평점 갱신 */
-  private void updatePerformanceAverageRating(String performanceId) {
+  /** 평균 평점 갱신 (신고 승인으로 리뷰가 숨김 처리될 때도 ReportService에서 호출됨) */
+  public void updatePerformanceAverageRating(String performanceId) {
     Double avg = reviewRepository.calculateAverageRating(performanceId);
     Performance performance = performanceRepository.findById(performanceId)
         .orElseThrow(() -> new CustomException(PerformanceReviewErrorCode.PERFORMANCE_NOT_FOUND));

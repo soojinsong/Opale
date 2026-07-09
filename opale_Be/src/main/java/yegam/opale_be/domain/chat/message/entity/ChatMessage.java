@@ -48,4 +48,8 @@ public class ChatMessage extends BaseTimeEntity {
 
   @Column(name = "deleted_at")
   private LocalDateTime deletedAt;
+
+  /** 신고 승인으로 숨김 처리됐는지 여부 (작성자 본인 삭제 isDeleted와는 별개) */
+  @Column(name = "hidden_by_report")
+  private Boolean hiddenByReport = false;
 }
