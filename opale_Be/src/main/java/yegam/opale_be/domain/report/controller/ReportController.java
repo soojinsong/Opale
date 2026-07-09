@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import yegam.opale_be.domain.report.dto.request.ReportCreateRequestDto;
@@ -41,7 +42,7 @@ public class ReportController {
   }
 
   /**
-   * 신고 목록 조회 (운영자용), 추후 SecurityConfig에서 ROLE_ADMIN 전용으로 제한 예정.
+   * 신고 목록 조회 (운영자용)
    *
    * @param page
    * @param size
@@ -50,6 +51,7 @@ public class ReportController {
    */
   @Operation(summary = "신고 목록 조회 (운영자용)", description = "신고 목록을 페이지네이션하여 조회합니다.")
   @GetMapping
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<BaseResponse<ReportListResponseDto>> getReports(
       @RequestParam(defaultValue = "1") int page,
       @RequestParam(defaultValue = "10") int size,
@@ -67,6 +69,7 @@ public class ReportController {
    */
   @Operation(summary = "신고 상세 조회 (운영자용)", description = "특정 신고의 상세 정보를 조회합니다.")
   @GetMapping("/{reportId}")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<BaseResponse<ReportDetailResponseDto>> getReportDetail(
       @PathVariable Long reportId
   ) {
@@ -85,6 +88,7 @@ public class ReportController {
    */
   @Operation(summary = "신고 처리 (운영자용)", description = "신고 상태를 승인/반려로 변경하고 관리자 메모를 저장합니다.")
   @PatchMapping("/{reportId}/status")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<BaseResponse<ReportDetailResponseDto>> updateReportStatus(
       @AuthenticationPrincipal Long adminId,
       @PathVariable Long reportId,
