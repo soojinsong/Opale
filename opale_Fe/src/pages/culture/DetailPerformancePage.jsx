@@ -60,6 +60,7 @@ import logApi from '../../api/logApi';
 import TicketSelectModal from '../../components/common/TicketSelectModal';
 import PerformanceDetailSkeleton from '../../components/common/PerformanceDetailSkeleton';
 import ReviewEditModal from '../../components/common/ReviewEditModal';
+import PerformanceTipModal from '../../components/common/PerformanceTipModal';
 import wickedPoster from '../../assets/poster/wicked.gif';
 
 const DetailPerformancePage = () => {
@@ -82,6 +83,8 @@ const DetailPerformancePage = () => {
   
   const [showTicketSelectModal, setShowTicketSelectModal] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState(null);
+
+  const [showTipModal, setShowTipModal] = useState(false);
   
   const [performance, setPerformance] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -642,6 +645,22 @@ const DetailPerformancePage = () => {
         <div className={styles.tabContent}>
           {activeTab === 'reservation' && (
             <div className={styles.reservationContent}>
+              <div className={styles.tipButtonContainer}>
+                <button
+                  type="button"
+                  className={styles.tipButton}
+                  onClick={() => {
+                    if (!currentUserId) {
+                      alert('로그인이 필요합니다.');
+                      return;
+                    }
+                    setShowTipModal(true);
+                  }}
+                >
+                  정보 제보하기
+                </button>
+              </div>
+
               <h3 className={styles.contentTitle}>가격</h3>
               <div className={styles.priceList}>
                 {bookingLoading ? (
@@ -725,6 +744,56 @@ const DetailPerformancePage = () => {
                             key={image.performanceImageId || index}
                             src={image.imageUrl}
                             alt={`좌석배치도 이미지 ${index + 1}`}
+                            className={styles.infoImage}
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                            }}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* 공지/안내 섹션 */}
+              {(bookingLoading || (bookingInfo?.noticeImages && bookingInfo.noticeImages.length > 0)) && (
+                <div className={styles.noticeSection}>
+                  <div className={styles.infoPlaceholder}>
+                    {bookingLoading ? (
+                      <p className={styles.placeholderText}>정보를 불러오는 중...</p>
+                    ) : (
+                      <div className={styles.imageContainer}>
+                        {bookingInfo.noticeImages.map((image, index) => (
+                          <img
+                            key={image.performanceImageId || index}
+                            src={image.imageUrl}
+                            alt={`공지/안내 이미지 ${index + 1}`}
+                            className={styles.infoImage}
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                            }}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* 기타 정보 섹션 */}
+              {(bookingLoading || (bookingInfo?.otherImages && bookingInfo.otherImages.length > 0)) && (
+                <div className={styles.otherInfoSection}>
+                  <div className={styles.infoPlaceholder}>
+                    {bookingLoading ? (
+                      <p className={styles.placeholderText}>정보를 불러오는 중...</p>
+                    ) : (
+                      <div className={styles.imageContainer}>
+                        {bookingInfo.otherImages.map((image, index) => (
+                          <img
+                            key={image.performanceImageId || index}
+                            src={image.imageUrl}
+                            alt={`기타 정보 이미지 ${index + 1}`}
                             className={styles.infoImage}
                             onError={(e) => {
                               e.target.style.display = 'none';
@@ -1086,6 +1155,13 @@ const DetailPerformancePage = () => {
         onClose={handleCloseEditModal}
         styles={styles}
       />
+
+      {showTipModal && (
+        <PerformanceTipModal
+          performanceId={performance?.performanceId || performance?.id || id}
+          onClose={() => setShowTipModal(false)}
+        />
+      )}
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { fetchPublicRoomByPerformance, createChatRoom } from '../../api/chatApi';
 import { normalizeExistenceChatRoomResponse } from '../../services/normalizeExistenceChatRoomResponse';
 import { normalizeChatRoomCreateRequest } from '../../services/normalizeChatRoomCreateRequest';
@@ -100,7 +100,6 @@ const OpenChatSection = ({ performanceId, performanceTitle, performanceGenre, pe
       <div className={styles.openChatSection}>
         <div className={styles.openChatHeader}>
           <h3 className={styles.sectionTitle}>오픈 채팅방</h3>
-          <Link to="#" className={styles.reportLink}>제보</Link>
         </div>
         <button className={styles.openChatButton} disabled>
           확인 중...
@@ -113,7 +112,6 @@ const OpenChatSection = ({ performanceId, performanceTitle, performanceGenre, pe
     <div className={styles.openChatSection}>
       <div className={styles.openChatHeader}>
         <h3 className={styles.sectionTitle}>오픈 채팅방</h3>
-        <Link to="#" className={styles.reportLink}>제보</Link>
       </div>
       {roomExists ? (
         <button 
