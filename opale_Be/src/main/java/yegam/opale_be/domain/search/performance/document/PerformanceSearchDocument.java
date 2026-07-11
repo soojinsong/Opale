@@ -34,6 +34,11 @@ public class PerformanceSearchDocument {
   @Field(type = FieldType.Text, analyzer = "nori")
   private String placeName;
 
+  /** 행정구역(시/도) 단위 정제된 값. placeName(공연장명 자유텍스트)과 달리 controlled vocabulary라
+   *  동음이의어 오매칭 없이 정확한 지역 필터링에 사용 (예: "경기"). Keyword 타입 = 분석 없이 정확히 일치. */
+  @Field(type = FieldType.Keyword)
+  private String area;
+
   private Long startDate;
   private Long endDate;
 

@@ -26,6 +26,7 @@ import yegam.opale_be.domain.search.performance.repository.PerformanceSearchRepo
 import java.util.Arrays;
 import java.util.List;
 import java.util.Comparator;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -48,6 +49,9 @@ public class PerformanceSearchIndexService {
                 .title(p.getTitle())
                 .genrenm(p.getGenrenm())
                 .placeName(p.getPlaceName())
+                // DB엔 "경기도"/"서울특별시"처럼 접미사 포함 전체 행정명으로 저장돼 있어서,
+                // 챗봇 검색어(normalizedPlace)와 같은 규칙으로 접미사를 떼어 정규화해야 term 매칭이 맞음
+                .area(p.getArea() != null ? stripAdminSuffixes(p.getArea()) : null)
 
                 .startDate(p.getStartDate() != null ? p.getStartDate().getTime() : null)
                 .endDate(p.getEndDate() != null ? p.getEndDate().getTime() : null)
@@ -154,6 +158,15 @@ public class PerformanceSearchIndexService {
   /** 한국 행정구역 접미사. 길이 긴 순으로 정렬해 "특별자치도" 같은 복합 접미사부터 제거되도록 함.
    *  Nori는 "제주도"를 "제주"+"도"로 쪼개는데, "도" 단독 토큰은 거의 모든 도(道) 단위 지명에
    *  공통으로 들어있어 match 쿼리의 OR 매칭에서 무관한 지역이 함께 걸리는 원인이 됨. */
+  /** 광역 행정구역(시/도) 표준 명칭. "경기"처럼 접미사를 뗀 결과가 이 목록에 속하면
+   *  placeName(자유텍스트) 대신 area(controlled vocabulary)로 매칭해 동음이의어 오매칭을 피함
+   *  (예: "경기" 검색 시 "역도경기장"처럼 placeName에 우연히 "경기"가 포함된 무관한 결과 방지).
+   *  "대학로"/"혜화"처럼 이 목록에 없는 세부 지명은 기존대로 placeName 매칭을 사용. */
+  private static final Set<String> KNOWN_AREAS = Set.of(
+      "서울", "부산", "대구", "인천", "광주", "대전", "울산", "세종",
+      "경기", "강원", "충북", "충남", "전북", "전남", "경북", "경남", "제주"
+  );
+
   private static final List<String> ADMIN_SUFFIXES = List.of(
       "특별자치도", "특별자치시", "광역시", "특별시", "자치도", "자치시", "자치군", "자치구",
       "도", "시", "군", "구", "읍", "면", "동", "리"
@@ -224,7 +237,12 @@ public class PerformanceSearchIndexService {
                 b.should(s -> s.match(m -> m.field("aiKeywords").query(keyword).boost(2.0f)));
               }
 
-              if (hasPlace) {
+              if (hasPlace && KNOWN_AREAS.contains(normalizedPlace)) {
+                // 광역 지명(경기/서울 등)은 controlled vocabulary인 area로 정확히 매칭
+                // → placeName 자유텍스트에 우연히 같은 글자가 섞여 있어도(예: 역도경기장) 영향받지 않음
+                b.must(m -> m.term(mm -> mm.field("area").value(normalizedPlace)));
+              } else if (hasPlace) {
+                // "대학로", "혜화"처럼 area 목록에 없는 세부 지명은 기존대로 placeName 텍스트 매칭
                 b.must(m -> m.match(mm -> mm.field("placeName").query(normalizedPlace)));
               } else if (hasKeyword) {
                 b.should(s -> s.match(m -> m.field("placeName").query(keyword).boost(1.0f)));
