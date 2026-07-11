@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useNavigationType } from 'react-router-dom';
 import styles from './ChatbotPage.module.css';
 import { streamChatbotMessage } from '../../api/chatbotApi';
 import defaultPoster from '../../assets/poster/wicked.gif';
@@ -63,11 +63,14 @@ const INITIAL_MESSAGE = {
   performances: [],
 };
 
-// 공연 카드 클릭 → 상세 페이지 이동 → 뒤로가기로 복귀했을 때 대화 내역이 초기화되지 않도록
-// sessionStorage에 보관 (탭 종료 시 자연 소멸, 새로고침/뒤로가기엔 유지됨)
+// 공연 카드 클릭 → 상세 페이지 이동 → 뒤로가기로 복귀했을 때만 대화 내역을 복원한다.
+// 홈/배너 등에서 새로 챗봇에 들어온 경우(PUSH)까지 복원해버리면 "챗봇 나갔다 다시
+// 들어와도 예전 대화가 계속 남아있는" 의도치 않은 동작이 되므로, 브라우저 히스토리
+// back/forward(POP)일 때만 sessionStorage에서 복원하고, 그 외엔 항상 새로 시작한다.
 const MESSAGES_STORAGE_KEY = 'opale_chatbot_messages';
 
-const loadStoredMessages = () => {
+const loadStoredMessages = (navigationType) => {
+  if (navigationType !== 'POP') return [INITIAL_MESSAGE];
   try {
     const saved = sessionStorage.getItem(MESSAGES_STORAGE_KEY);
     const parsed = saved ? JSON.parse(saved) : null;
@@ -80,7 +83,8 @@ const loadStoredMessages = () => {
 
 const ChatbotPage = () => {
   const navigate = useNavigate();
-  const [messages, setMessages] = useState(loadStoredMessages);
+  const navigationType = useNavigationType();
+  const [messages, setMessages] = useState(() => loadStoredMessages(navigationType));
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamingText, setStreamingText] = useState('');
