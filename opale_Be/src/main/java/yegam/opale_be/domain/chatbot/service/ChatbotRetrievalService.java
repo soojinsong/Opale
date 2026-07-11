@@ -53,27 +53,39 @@ public class ChatbotRetrievalService {
   }
 
   private List<ChatbotPerformanceDto> retrievePersonalized(Long userId, ChatbotQueryRouteDto route) {
+    // place/genre 필터가 없는 순수 개인화 요청("내가 좋아할만한 공연 추천해줘")은 검색 가능한
+    // 구체적 키워드가 원래 없어서, 벡터 없을 때 KEYWORD로 폴백하면 사실상 항상 빈 결과가 됨.
+    // 메인 추천 시스템(RecommendationService)의 콜드 스타터 폴백(인기 공연)과 동일하게 맞춤.
+    // 반대로 필터가 있는 경우엔 그 필터를 잃으면 안 되니 기존대로 KEYWORD(필터 유지) 폴백 유지.
+    boolean hasFilter = !isBlank(route.getPlace()) || !isBlank(route.getGenre());
+
     if (userId == null) {
-      log.info("PERSONALIZED 요청이지만 비로그인 → KEYWORD fallback");
-      return retrieveByKeyword(route.getKeyword(), route.getPlace(), route.getGenre());
+      log.info("PERSONALIZED 요청이지만 비로그인 → {} fallback", hasFilter ? "KEYWORD" : "인기 공연");
+      return hasFilter
+          ? retrieveByKeyword(route.getKeyword(), route.getPlace(), route.getGenre())
+          : retrievePopularFallback();
     }
     try {
       Optional<UserPreferenceVector> vectorOpt = preferenceVectorRepository.findById(userId);
       if (vectorOpt.isEmpty()) {
-        log.info("유저 벡터 없음 → KEYWORD fallback, userId={}", userId);
-        return retrieveByKeyword(route.getKeyword(), route.getPlace(), route.getGenre());
+        log.info("유저 벡터 없음 → {} fallback, userId={}", hasFilter ? "KEYWORD" : "인기 공연", userId);
+        return hasFilter
+            ? retrieveByKeyword(route.getKeyword(), route.getPlace(), route.getGenre())
+            : retrievePopularFallback();
       }
       List<Double> vector = embeddingVectorUtil.parseToList(vectorOpt.get().getEmbeddingVector());
       if (vector == null) {
-        log.info("벡터 파싱 실패 → KEYWORD fallback, userId={}", userId);
-        return retrieveByKeyword(route.getKeyword(), route.getPlace(), route.getGenre());
+        log.info("벡터 파싱 실패 → {} fallback, userId={}", hasFilter ? "KEYWORD" : "인기 공연", userId);
+        return hasFilter
+            ? retrieveByKeyword(route.getKeyword(), route.getPlace(), route.getGenre())
+            : retrievePopularFallback();
       }
 
-      boolean hasFilter = !isBlank(route.getPlace()) || !isBlank(route.getGenre());
       if (!hasFilter) {
         List<PineconeMatch> matches = pineconeClientUtil.query(vector, CHATBOT_TOP_K);
         List<String> ids = matches.stream().map(PineconeMatch::getId).toList();
-        return fetchAndConvert(ids);
+        List<ChatbotPerformanceDto> results = fetchAndConvert(ids);
+        return results.isEmpty() ? retrievePopularFallback() : results;
       }
 
       // Pinecone은 취향 유사도만 반영해서 place/genre를 모른다 → 후보를 넉넉히 뽑아 직접 필터링
@@ -94,9 +106,17 @@ public class ChatbotRetrievalService {
       log.info("PERSONALIZED 결과가 place/genre 조건과 안 맞음 → KEYWORD fallback, userId={}", userId);
       return retrieveByKeyword(route.getKeyword(), route.getPlace(), route.getGenre());
     } catch (Exception e) {
-      log.warn("PERSONALIZED 검색 실패 → KEYWORD fallback: {}", e.getMessage());
-      return retrieveByKeyword(route.getKeyword(), route.getPlace(), route.getGenre());
+      log.warn("PERSONALIZED 검색 실패 → {} fallback: {}", hasFilter ? "KEYWORD" : "인기 공연", e.getMessage());
+      return hasFilter
+          ? retrieveByKeyword(route.getKeyword(), route.getPlace(), route.getGenre())
+          : retrievePopularFallback();
     }
+  }
+
+  private List<ChatbotPerformanceDto> retrievePopularFallback() {
+    return performanceRepository.findPopularPerformances(PageRequest.of(0, CHATBOT_TOP_K)).stream()
+        .map(this::toDto)
+        .toList();
   }
 
   private List<ChatbotPerformanceDto> retrieveInfo(String keyword, String place, String genre) {
