@@ -63,9 +63,24 @@ const INITIAL_MESSAGE = {
   performances: [],
 };
 
+// 공연 카드 클릭 → 상세 페이지 이동 → 뒤로가기로 복귀했을 때 대화 내역이 초기화되지 않도록
+// sessionStorage에 보관 (탭 종료 시 자연 소멸, 새로고침/뒤로가기엔 유지됨)
+const MESSAGES_STORAGE_KEY = 'opale_chatbot_messages';
+
+const loadStoredMessages = () => {
+  try {
+    const saved = sessionStorage.getItem(MESSAGES_STORAGE_KEY);
+    const parsed = saved ? JSON.parse(saved) : null;
+    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+  } catch (e) {
+    // 파싱 실패 시 그냥 초기 메시지로 시작
+  }
+  return [INITIAL_MESSAGE];
+};
+
 const ChatbotPage = () => {
   const navigate = useNavigate();
-  const [messages, setMessages] = useState([INITIAL_MESSAGE]);
+  const [messages, setMessages] = useState(loadStoredMessages);
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamingText, setStreamingText] = useState('');
@@ -76,6 +91,14 @@ const ChatbotPage = () => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, streamingText]);
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(MESSAGES_STORAGE_KEY, JSON.stringify(messages));
+    } catch (e) {
+      // 저장 실패(용량 초과 등)해도 채팅 자체엔 영향 없이 무시
+    }
+  }, [messages]);
 
   const handleSend = async () => {
     const trimmed = input.trim();
