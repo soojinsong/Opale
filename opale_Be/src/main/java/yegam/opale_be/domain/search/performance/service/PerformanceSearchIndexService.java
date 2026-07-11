@@ -211,18 +211,28 @@ public class PerformanceSearchIndexService {
     String normalizedPlace = hasPlace ? stripAdminSuffixes(place) : place;
 
     // genre가 keyword 안에도 중복으로 들어있으면(예: keyword="타이타닉 뮤지컬", genre="뮤지컬") OR 매칭에서
-    // "뮤지컬" 토큰 하나만으로 MUST를 통과시켜버려 무관한 결과가 새어나옴 → strict 매칭에서는 genre 중복 제거
+    // "뮤지컬" 토큰 하나만으로 MUST를 통과시켜버려 무관한 결과가 새어나옴 → strict 매칭에서는 genre 중복 제거.
+    // keyword가 genre랑 완전히 같아서(예: keyword="연극", genre="연극") 제거하면 아예 남는 게 없는 경우엔
+    // "실질적으로 구분되는 keyword가 없다"고 보고 아래 minimumShouldMatch 강제 자체를 건너뜀 — 안 그러면
+    // genre로 이미 다 걸러진 결과인데도 aiSummary 등에 그 장르 단어가 우연히 없다는 이유로 정상 결과가 탈락함
+    // (예: "혜화에서 하는 연극 추천해줘" → keyword="연극"인데 aiSummary에 "연극"이란 단어가 없는 대학로 연극이 통째로 빠짐).
     String strictKeyword = keyword;
+    boolean hasDistinctKeyword = hasKeyword;
     if (hasKeyword && hasGenre) {
       String stripped = keyword.replace(genre, "").trim();
-      if (!stripped.isBlank()) strictKeyword = stripped;
+      if (!stripped.isBlank()) {
+        strictKeyword = stripped;
+      } else {
+        hasDistinctKeyword = false;
+      }
     }
     String finalStrictKeyword = strictKeyword;
+    boolean finalHasDistinctKeyword = hasDistinctKeyword;
 
     NativeQuery query = NativeQuery.builder()
         .withQuery(q -> q
             .bool(b -> {
-              if (hasKeyword && requireKeywordMatch) {
+              if (finalHasDistinctKeyword && requireKeywordMatch) {
                 b.must(m -> m.bool(bb -> bb
                     .should(s -> s.matchPhrasePrefix(mm -> mm.field("title").query(finalStrictKeyword).boost(5.0f)))
                     .should(s -> s.match(mm -> mm.field("title").query(finalStrictKeyword).fuzziness("AUTO").boost(2.0f)))
@@ -230,11 +240,20 @@ public class PerformanceSearchIndexService {
                     .should(s -> s.match(mm -> mm.field("aiKeywords").query(finalStrictKeyword).boost(2.0f)))
                     .minimumShouldMatch("1")
                 ));
-              } else if (hasKeyword) {
-                b.should(s -> s.matchPhrasePrefix(m -> m.field("title").query(keyword).boost(5.0f)));
-                b.should(s -> s.match(m -> m.field("title").query(keyword).fuzziness("AUTO").boost(2.0f)));
-                b.should(s -> s.match(m -> m.field("aiSummary").query(keyword).boost(3.0f)));
-                b.should(s -> s.match(m -> m.field("aiKeywords").query(keyword).boost(2.0f)));
+              } else if (finalHasDistinctKeyword) {
+                // genre/place가 must로 걸리면 아래 should절들이 minimumShouldMatch 없이는
+                // 전부 선택사항이 되어버려서, keyword가 하나도 안 맞아도 genre/place만 맞는
+                // 무관한 결과가 새어나옴 (예: "위티두" → genre=뮤지컬만으로 무관한 뮤지컬 반환).
+                // strict 경로와 동일하게 "최소 1개는 실제로 걸려야 함" 조건을 강제.
+                // (keyword가 genre랑 완전히 겹쳐 구분되는 키워드가 없는 경우는 hasDistinctKeyword=false라
+                //  이 강제 자체가 적용 안 되고 genre/place MUST만으로 판단 — 위 "혜화" 회귀 케이스 참고)
+                b.must(m -> m.bool(bb -> bb
+                    .should(s -> s.matchPhrasePrefix(mm -> mm.field("title").query(finalStrictKeyword).boost(5.0f)))
+                    .should(s -> s.match(mm -> mm.field("title").query(finalStrictKeyword).fuzziness("AUTO").boost(2.0f)))
+                    .should(s -> s.match(mm -> mm.field("aiSummary").query(finalStrictKeyword).boost(3.0f)))
+                    .should(s -> s.match(mm -> mm.field("aiKeywords").query(finalStrictKeyword).boost(2.0f)))
+                    .minimumShouldMatch("1")
+                ));
               }
 
               if (hasPlace && KNOWN_AREAS.contains(normalizedPlace)) {

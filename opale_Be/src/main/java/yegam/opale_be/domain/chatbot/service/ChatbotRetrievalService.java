@@ -100,7 +100,10 @@ public class ChatbotRetrievalService {
   }
 
   private List<ChatbotPerformanceDto> retrieveInfo(String keyword, String place, String genre) {
-    if (isBlank(keyword) && isBlank(place) && isBlank(genre)) return List.of();
+    // INFO는 "특정 공연 하나를 찾는" 질의라 keyword(제목 단서) 없이는 검색이 성립하지 않음.
+    // keyword 없이 genre/place만으로 진행하면 동명 장르의 무관한 공연이 걸려 나와
+    // "모른다"는 답변 텍스트와 근거 공연 카드가 서로 안 맞는 상황이 생김 (grounding 깨짐).
+    if (isBlank(keyword)) return List.of();
 
     List<String> ids = searchIndexService.searchForChatbotInfo(keyword, place, genre);
     if (!ids.isEmpty()) return fetchAndConvert(ids);
