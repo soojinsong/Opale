@@ -58,3 +58,9 @@ logs/
 CLAUDE.md
 BUG_REPORT.md
 opale_diagram.md
+
+# ================================
+# 로컬 전용 참고 자료 (git 추적 안 함)
+# ================================
+kopis-batch-local/
+recommendation_cbf_vs_cf_note.md
