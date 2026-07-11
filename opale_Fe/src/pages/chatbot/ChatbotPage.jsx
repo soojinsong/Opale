@@ -59,7 +59,7 @@ const renderPlainText = (text) => {
 
 const INITIAL_MESSAGE = {
   type: 'bot',
-  text: '안녕하세요! 공연에 대해 무엇이든 물어보세요.\n예) "혜화에서 하는 연극 추천해줘", "데이트할 때 좋은 뮤지컬"',
+  text: '안녕하세요! 공연에 대해 무엇이든 물어보세요.\n예) "혜화에서 하는 연극 추천해줘", "위키드 예매처 알려줘"',
   performances: [],
 };
 
