@@ -67,7 +67,7 @@ const DetailPerformancePage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { user } = useSelector((state) => state.user);
+  const { user, isLoggedIn } = useSelector((state) => state.user);
   const currentUserId = user?.userId || user?.id || null;
   const [activeTab, setActiveTab] = useState('detail');
   const [isFavorite, setIsFavorite] = useState(false);
@@ -209,7 +209,14 @@ const DetailPerformancePage = () => {
   useEffect(() => {
     const loadFavoriteStatus = async () => {
       if (!performanceId) return;
-      
+
+      // 비로그인 상태면 어차피 401만 나는 인증 필요 API라, 요청 자체를 안 보내고
+      // 바로 빈 하트로 표시 (불필요한 실패 요청 + 그로 인한 401 처리 로직 트리거 방지)
+      if (!isLoggedIn) {
+        setIsFavorite(false);
+        return;
+      }
+
       try {
         const liked = await isPerformanceLiked(performanceId);
         setIsFavorite(liked);
@@ -220,7 +227,7 @@ const DetailPerformancePage = () => {
     };
 
     loadFavoriteStatus();
-  }, [performanceId]);
+  }, [performanceId, isLoggedIn]);
 
   useEffect(() => {
     const loadVideos = async () => {
@@ -269,14 +276,22 @@ const DetailPerformancePage = () => {
       } else {
         setExpectations(normalizedReviews);
         const likesMap = {};
-        for (const expectation of normalizedReviews) {
-          try {
-            const liked = await isPerformanceReviewLiked(expectation.id);
-            likesMap[expectation.id] = liked;
-          } catch (err) {
-            console.error(`기대평 ${expectation.id} 관심 여부 조회 실패:`, err);
-            likesMap[expectation.id] = false;
+        // 비로그인이면 인증 필요한 API라 어차피 다 401 — 기대평 개수만큼 불필요한 실패 요청을
+        // 반복하지 않고 바로 전부 false로 표시
+        if (isLoggedIn) {
+          for (const expectation of normalizedReviews) {
+            try {
+              const liked = await isPerformanceReviewLiked(expectation.id);
+              likesMap[expectation.id] = liked;
+            } catch (err) {
+              console.error(`기대평 ${expectation.id} 관심 여부 조회 실패:`, err);
+              likesMap[expectation.id] = false;
+            }
           }
+        } else {
+          normalizedReviews.forEach((expectation) => {
+            likesMap[expectation.id] = false;
+          });
         }
         setExpectationLikes(likesMap);
       }

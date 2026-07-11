@@ -93,7 +93,19 @@ axiosInstance.interceptors.response.use(
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
         store.dispatch(logout());
-        window.location.href = "/login";
+        // /my, /admin처럼 "로그인 안 하면 볼 수 없는" 페이지엔 라우트 단 가드가 따로 없어서
+        // (admin은 RequireAdmin이 있지만 /my는 없음) 이 리다이렉트 하나로 보호돼 왔음.
+        // 근데 공연 상세처럼 "비로그인도 봐도 되는 페이지"에서 찜 상태 조회 같은 부가
+        // 인증 API 하나만 401 나도 페이지 전체를 로그인으로 쫓아내던 게 문제였음 →
+        // 진짜 보호가 필요한 경로에서만 리다이렉트하도록 좁힘. 그 외 경로는 토큰만
+        // 정리하고(=UI가 로그아웃 상태로 갱신됨) 현재 페이지에 그대로 둠.
+        const protectedPathPrefixes = ["/my", "/admin"];
+        const isOnProtectedPath = protectedPathPrefixes.some((prefix) =>
+          window.location.pathname.startsWith(prefix)
+        );
+        if (isOnProtectedPath) {
+          window.location.href = "/login";
+        }
       } finally {
         isRefreshing = false;
       }
