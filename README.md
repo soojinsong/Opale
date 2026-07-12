@@ -6,9 +6,9 @@
 
 ## 📌 프로젝트 소개
 
-[![Opale 프로젝트 시연](https://img.youtube.com/vi/t-AnrghHGtM/hqdefault.jpg)](https://youtu.be/t-AnrghHGtM)
+[![Opale 프로젝트 시연](https://img.youtube.com/vi/536kv2noYzk/hqdefault.jpg)](https://youtu.be/536kv2noYzk?si=qdLdHcBsTglY2p-P)
 
-👉 [클릭하면 시연 영상으로 이동](https://youtu.be/t-AnrghHGtM)
+👉 [클릭하면 시연 영상으로 이동](https://youtu.be/536kv2noYzk?si=qdLdHcBsTglY2p-P)
 
 Opale은 공연 정보를 한 곳에서 탐색하고,
 사용자 간 소통과 개인화 추천까지 제공하는 **공연 정보 종합 플랫폼 웹앱**입니다.
@@ -50,9 +50,8 @@ Opale은 공연 정보를 한 곳에서 탐색하고,
 ---
 
 ## 🗄️ ERD
-(업데이트 진행 중)
 
-<img width="800" alt="ERD_Opale" src="https://github.com/user-attachments/assets/830b0203-e2f4-4b57-ba52-6391737b69cb" />
+<img width="800" alt="ERD_Opale" src="https://github.com/user-attachments/assets/54a0c958-acac-4cd2-8c4e-9eb7c9ef0f10" />
 
 - 공연(Performance)과 공연장(Place)을 중심으로 예약, 리뷰, 좋아요, 채팅방이 연결되도록 설계했습니다.
 - 사용자 행동 로그(user_event_logs)와 선호 벡터(user_preference_vectors)는 추천 시스템의 재료로 활용됩니다.
